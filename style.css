@@ -1,0 +1,1712 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Hiragino Kaku Gothic ProN",
+    "Yu Gothic",
+    sans-serif;
+
+  background:
+    radial-gradient(
+      circle at top,
+      #fff4c7 0%,
+      #ffd166 35%,
+      #f4a261 70%,
+      #e76f51 100%
+    );
+
+  color: #2c2c2c;
+}
+
+button {
+  font: inherit;
+}
+
+.app {
+  width: 100%;
+  min-height: 100vh;
+
+  padding: 24px 16px;
+}
+
+.home-screen {
+  width: 100%;
+  max-width: 430px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-area {
+  width: 100%;
+  text-align: center;
+
+  margin-top: 18px;
+}
+
+.small-title {
+  margin: 0;
+
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+
+  color: rgba(44, 44, 44, 0.65);
+}
+
+h1 {
+  margin: 10px 0 4px;
+
+  font-size: 36px;
+  line-height: 1.2;
+}
+
+.catch-copy {
+  margin: 0;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  color: rgba(44, 44, 44, 0.75);
+}
+
+.main-card-preview {
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+
+  margin: 38px 0 32px;
+}
+
+.preview-card {
+  width: 190px;
+  aspect-ratio: 0.7;
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #303030,
+      #111111
+    );
+
+  border: 4px solid rgba(255, 255, 255, 0.65);
+
+  box-shadow:
+    0 18px 35px rgba(0, 0, 0, 0.25),
+    inset 0 0 30px rgba(255, 255, 255, 0.05);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  color: white;
+}
+
+.preview-question {
+  width: 78px;
+  height: 78px;
+
+  border-radius: 50%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  border: 2px solid rgba(255, 255, 255, 0.25);
+
+  font-size: 48px;
+  font-weight: 900;
+}
+
+.preview-card p {
+  margin-top: 22px;
+
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 2px;
+
+  opacity: 0.65;
+}
+
+.menu {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.button {
+  width: 100%;
+
+  border: none;
+
+  border-radius: 18px;
+
+  padding: 16px 20px;
+
+  font-size: 17px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.button:active {
+  transform: scale(0.97);
+}
+
+.primary {
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ff7b00,
+      #ff006e
+    );
+
+  box-shadow:
+    0 8px 20px rgba(255, 0, 110, 0.25);
+}
+
+.secondary {
+  color: #333;
+
+  background: rgba(255, 255, 255, 0.82);
+
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.12);
+}
+/* -------------------------
+   画面切り替え
+------------------------- */
+
+.screen {
+  display: none;
+  width: 100%;
+}
+
+.screen.active {
+  display: block;
+}
+
+
+/* -------------------------
+   10連ガチャ画面
+------------------------- */
+
+.gacha-screen {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+.gacha-header {
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin-top: 10px;
+}
+
+.gacha-header h2 {
+  margin: 0;
+
+  font-size: 28px;
+}
+
+.back-button {
+  position: absolute;
+
+  left: 0;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: 46px;
+  height: 46px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.8);
+
+  font-size: 24px;
+  font-weight: bold;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.gacha-message {
+  text-align: center;
+
+  margin: 18px 0 28px;
+
+  font-weight: 700;
+
+  color: rgba(44, 44, 44, 0.75);
+}
+
+
+/* -------------------------
+   10枚のカード
+------------------------- */
+
+.card-grid {
+  width: 100%;
+
+  display: grid;
+
+  /* 横5枚 */
+  grid-template-columns: repeat(5, 1fr);
+
+  gap: 8px;
+
+  padding: 10px 4px 30px;
+}
+
+.closed-card {
+  width: 100%;
+
+  /* トレーディングカードっぽい縦長比率 */
+  aspect-ratio: 0.7;
+
+  border-radius: 10px;
+
+  border: 2px solid rgba(255, 255, 255, 0.55);
+
+  background:
+    linear-gradient(
+      145deg,
+      #303030,
+      #101010
+    );
+
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.22),
+    inset 0 0 12px rgba(255, 255, 255, 0.04);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: relative;
+
+  padding: 0;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.closed-card span {
+  width: 32px;
+  height: 32px;
+
+  border-radius: 50%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  background: rgba(255, 255, 255, 0.07);
+
+  color: white;
+
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.closed-card:hover {
+  transform: translateY(-4px);
+
+  box-shadow:
+    0 14px 26px rgba(0, 0, 0, 0.28),
+    0 0 15px rgba(255, 255, 255, 0.15);
+}
+
+.closed-card:active {
+  transform: scale(0.96);
+}
+/* =========================
+   スマホ向け全体レイアウト調整
+========================= */
+
+.screen {
+  width: 100%;
+}
+
+.home-screen,
+.gacha-screen {
+  width: min(100%, 430px);
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (max-width: 380px) {
+
+  .app {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .card-grid {
+    gap: 6px;
+  }
+
+  .closed-card {
+    border-radius: 8px;
+  }
+
+  .closed-card span {
+    width: 26px;
+    height: 26px;
+
+    font-size: 17px;
+  }
+
+}
+/* =========================
+   開封後カード
+========================= */
+
+.closed-card.opened {
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #f3f3f3
+    );
+
+  color: #222;
+
+  border: 2px solid rgba(255, 255, 255, 0.9);
+
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.18);
+
+  transform: rotateY(0deg);
+}
+
+.closed-card.opened span {
+  display: none;
+}
+
+.card-result {
+  display: none;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 8px 5px;
+
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+}
+
+.closed-card.opened .card-result {
+  display: flex;
+}
+
+.result-rarity {
+  font-size: 14px;
+  font-weight: 900;
+
+  margin-bottom: 8px;
+}
+
+.result-name {
+  font-size: 12px;
+  font-weight: 900;
+
+  line-height: 1.3;
+}
+
+
+/* レア度カラー */
+
+.closed-card.opened.rarity-N {
+  background:
+    linear-gradient(
+      145deg,
+      #ececec,
+      #bdbdbd
+    );
+}
+
+.closed-card.opened.rarity-R {
+  background:
+    linear-gradient(
+      145deg,
+      #8ec5ff,
+      #3f7cff
+    );
+
+  color: white;
+}
+
+.closed-card.opened.rarity-SR {
+  background:
+    linear-gradient(
+      145deg,
+      #d49cff,
+      #7b36d8
+    );
+
+  color: white;
+}
+
+.closed-card.opened.rarity-SSR {
+  background:
+    linear-gradient(
+      145deg,
+      #ffe38a,
+      #ff9f1c
+    );
+
+  color: #3b2600;
+}
+
+.closed-card.opened.rarity-UR {
+  background:
+    linear-gradient(
+      145deg,
+      #7efce8,
+      #7d8cff,
+      #ff86e1
+    );
+
+  color: white;
+}
+/* =========================
+   カード開封アニメーション
+========================= */
+
+.closed-card {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+/* =========================
+   通常カード開封
+========================= */
+
+.closed-card {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  will-change: transform;
+}
+
+.closed-card.opening {
+  animation:
+    cardOpen 0.72s cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+
+@keyframes cardOpen {
+
+  0% {
+    transform:
+      translateY(0)
+      scale(1)
+      rotateY(0deg);
+  }
+
+  12% {
+    transform:
+      translateY(-5px)
+      scale(1.03)
+      rotateY(0deg);
+  }
+
+  22% {
+    transform:
+      translateY(-5px)
+      translateX(-2px)
+      scale(1.03)
+      rotateY(0deg);
+  }
+
+  30% {
+    transform:
+      translateY(-5px)
+      translateX(2px)
+      scale(1.03)
+      rotateY(0deg);
+  }
+
+  38% {
+    transform:
+      translateY(-5px)
+      scale(1.04)
+      rotateY(0deg);
+  }
+
+  58% {
+    transform:
+      translateY(-6px)
+      scale(1.06)
+      rotateY(90deg);
+  }
+
+  62% {
+    transform:
+      translateY(-6px)
+      scale(1.06)
+      rotateY(90deg);
+  }
+
+  100% {
+    transform:
+      translateY(0)
+      scale(1)
+      rotateY(0deg);
+  }
+
+}
+
+
+/* =========================
+   結果を見るボタン
+========================= */
+
+.result-button-area {
+  display: none;
+
+  width: 100%;
+
+  margin-top: 24px;
+
+  padding-bottom: 30px;
+}
+
+.result-button-area.show {
+  display: block;
+}
+
+.result-button {
+  width: 100%;
+
+  border: none;
+
+  border-radius: 18px;
+
+  padding: 16px 20px;
+
+  font-size: 17px;
+  font-weight: 900;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ff7b00,
+      #ff006e
+    );
+
+  box-shadow:
+    0 8px 20px rgba(255, 0, 110, 0.25);
+
+  cursor: pointer;
+}
+
+.result-button:active {
+  transform: scale(0.97);
+}
+/* =========================
+   リザルト画面
+========================= */
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+
+  gap: 8px;
+
+  margin-top: 18px;
+}
+
+.result-card {
+  position: relative;
+
+  aspect-ratio: 0.7;
+
+  border-radius: 10px;
+
+  border: 2px solid rgba(255, 255, 255, 0.75);
+
+  padding: 6px 4px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.18);
+
+  overflow: hidden;
+}
+
+.result-card-rarity {
+  font-size: 13px;
+  font-weight: 900;
+
+  margin-bottom: 6px;
+}
+
+.result-card-name {
+  font-size: 11px;
+  font-weight: 900;
+
+  line-height: 1.2;
+}
+
+.new-badge {
+  position: absolute;
+
+  top: 4px;
+  left: 4px;
+
+  padding: 3px 5px;
+
+  border-radius: 6px;
+
+  background: #ff1744;
+
+  color: white;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+
+/* =========================
+   アルバム
+========================= */
+
+.album-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 10px;
+
+  padding-bottom: 30px;
+}
+
+.album-card {
+  position: relative;
+
+  background: transparent;
+  border: none;
+  border-radius: 0;
+
+  box-shadow: none;
+
+  padding: 0;
+
+  overflow: visible;
+
+  cursor: pointer;
+}
+
+.album-rarity {
+  font-size: 14px;
+  font-weight: 900;
+
+  margin-bottom: 8px;
+}
+
+.album-name {
+  font-size: 12px;
+  font-weight: 900;
+
+  line-height: 1.3;
+}
+
+.album-count-badge {
+  position: absolute;
+
+  right: 5px;
+  bottom: 5px;
+
+  padding: 3px 6px;
+
+  border-radius: 999px;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  color: white;
+
+  font-size: 10px;
+  font-weight: 900;
+}
+
+
+/* レア度カラー */
+
+.rarity-N {
+  background:
+    linear-gradient(
+      145deg,
+      #ececec,
+      #bdbdbd
+    );
+
+  color: #222;
+}
+
+.rarity-R {
+  background:
+    linear-gradient(
+      145deg,
+      #8ec5ff,
+      #3f7cff
+    );
+
+  color: white;
+}
+
+.rarity-SR {
+  background:
+    linear-gradient(
+      145deg,
+      #d49cff,
+      #7b36d8
+    );
+
+  color: white;
+}
+
+.rarity-SSR {
+  background:
+    linear-gradient(
+      145deg,
+      #ffe38a,
+      #ff9f1c
+    );
+
+  color: #3b2600;
+}
+
+.rarity-UR {
+  background:
+    linear-gradient(
+      145deg,
+      #7efce8,
+      #7d8cff,
+      #ff86e1
+    );
+
+  color: white;
+}
+
+
+/* =========================
+   スマホ調整
+========================= */
+
+@media (max-width: 380px) {
+
+  .result-grid {
+    gap: 5px;
+  }
+
+  .result-card-name {
+    font-size: 9px;
+  }
+
+  .album-grid {
+    gap: 8px;
+  }
+
+}
+/* =========================
+   画面表示を完全に1つだけにする
+========================= */
+
+.screen {
+  display: none !important;
+  width: 100%;
+}
+
+.screen.active {
+  display: block !important;
+}
+/* =========================
+   アルバム並び替え
+========================= */
+
+.album-controls {
+  width: 100%;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  gap: 8px;
+
+  margin: -6px 0 18px;
+}
+
+.album-controls label {
+  font-size: 13px;
+  font-weight: 700;
+
+  color: rgba(44, 44, 44, 0.7);
+}
+
+.album-controls select {
+  border: none;
+
+  border-radius: 12px;
+
+  padding: 9px 12px;
+
+  background: rgba(255, 255, 255, 0.82);
+
+  color: #222;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.1);
+
+  cursor: pointer;
+}
+/* =========================
+   未入手カード
+========================= */
+
+.album-card.locked {
+  aspect-ratio: 3 / 4;
+
+  background:
+    linear-gradient(
+      145deg,
+      #2f2f2f,
+      #111111
+    );
+
+  color: white;
+
+  border: 2px solid rgba(255, 255, 255, 0.35);
+
+  border-radius: 0;
+
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.22);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px;
+
+  box-sizing: border-box;
+}
+
+.album-card.locked .album-name {
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.locked-question {
+  width: 44px;
+  height: 44px;
+
+  border-radius: 50%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin-bottom: 10px;
+
+  background:
+    rgba(255, 255, 255, 0.07);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.25);
+
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.locked-number {
+  margin-top: 8px;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  opacity: 0.55;
+}
+/* =========================
+   カード番号表示
+========================= */
+
+.album-number {
+  position: absolute;
+
+  left: 6px;
+  bottom: 6px;
+
+  padding: 3px 6px;
+
+  border-radius: 999px;
+
+  background: rgba(0, 0, 0, 0.18);
+
+  color: rgba(255, 255, 255, 0.92);
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.rarity-N .album-number {
+  background: rgba(0, 0, 0, 0.22);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.rarity-SSR .album-number {
+  background: rgba(0, 0, 0, 0.18);
+  color: rgba(255, 255, 255, 0.95);
+}
+.detail-card {
+  width: min(82vw, 320px);
+
+  margin: 32px auto;
+
+  aspect-ratio: 0.7;
+
+  border-radius: 22px;
+
+  border: 3px solid rgba(255, 255, 255, 0.85);
+
+  box-shadow:
+    0 16px 30px rgba(0, 0, 0, 0.22);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 22px;
+}
+
+.detail-rarity {
+  align-self: flex-end;
+
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.detail-image-placeholder {
+  width: 75%;
+  aspect-ratio: 1;
+
+  margin: 20px 0;
+
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.2);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-weight: 900;
+  opacity: 0.6;
+}
+
+.detail-name {
+  font-size: 24px;
+  font-weight: 900;
+
+  text-align: center;
+
+  margin-bottom: 18px;
+}
+
+.detail-info {
+  font-size: 14px;
+  font-weight: 700;
+
+  margin-top: 6px;
+}
+.open-all-area {
+  width: 100%;
+
+  margin-top: 20px;
+}
+
+.open-all-area.hidden {
+  display: none;
+}
+/* =========================
+   ガチャ開封時 NEW バッジ
+========================= */
+
+.gacha-new-badge {
+  position: absolute;
+
+  top: 4px;
+  left: 4px;
+
+  padding: 3px 5px;
+
+  border-radius: 6px;
+
+  background: #ff1744;
+
+  color: white;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.18);
+
+  z-index: 3;
+}
+/* =========================
+   ガチャ終了後ボタン調整
+========================= */
+
+#after-gacha-area {
+  display: none;
+  width: 100%;
+
+  margin-top: 30px;
+}
+
+#after-gacha-area.show {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+#after-gacha-area .result-button,
+#after-gacha-area .button {
+  margin: 0;
+}
+
+#retry-gacha-button {
+  margin-bottom: 2px;
+}
+#gacha-home-button {
+  opacity: 0.85;
+}
+/* =========================
+   召喚演出：暗転
+========================= */
+
+.summon-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0);
+
+  pointer-events: none;
+
+  z-index: 9999;
+
+  transition:
+    background 0.45s ease;
+}
+
+.summon-overlay.active {
+  background: rgba(0, 0, 0, 0.94);
+
+  pointer-events: auto;
+}
+/* =========================
+   通常召喚：魔法陣
+========================= */
+
+.magic-circle {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: min(62vw, 280px);
+  aspect-ratio: 1;
+
+  transform:
+    translate(-50%, -50%)
+    scale(0.65);
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  transition:
+    opacity 0.35s ease,
+    transform 0.45s ease;
+
+  filter:
+    drop-shadow(0 0 10px rgba(255, 220, 120, 0.7))
+    drop-shadow(0 0 24px rgba(255, 180, 80, 0.45));
+}
+.magic-circle.hiding {
+  opacity: 0;
+
+  transform:
+    translate(-50%, -50%)
+    scale(0.35);
+}
+
+
+/* 表示状態 */
+
+.magic-circle.show {
+  opacity: 1;
+
+  transform:
+    translate(-50%, -50%)
+    scale(1);
+}
+
+
+/* =========================
+   魔法陣のリング
+========================= */
+
+.magic-ring {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  border-radius: 50%;
+
+  border:
+    2px solid rgba(255, 225, 150, 0.9);
+
+  transform:
+    translate(-50%, -50%);
+
+  box-shadow:
+    inset 0 0 12px rgba(255, 220, 150, 0.25),
+    0 0 12px rgba(255, 210, 120, 0.4);
+}
+
+
+/* 外側 */
+
+.ring-outer {
+  width: 100%;
+  height: 100%;
+
+  border-width: 3px;
+
+  animation:
+    magicRotate 6s linear infinite;
+}
+
+
+/* 真ん中 */
+
+.ring-middle {
+  width: 72%;
+  height: 72%;
+
+  border-style: dashed;
+
+  animation:
+    magicRotateReverse 4s linear infinite;
+}
+
+
+/* 内側 */
+
+.ring-inner {
+  width: 42%;
+  height: 42%;
+
+  border-width: 2px;
+
+  animation:
+    magicPulse 1.1s ease-in-out infinite;
+}
+
+
+/* =========================
+   中央シンボル
+========================= */
+
+.magic-symbol {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  color: #ffe8a0;
+
+  font-size: 72px;
+
+  text-shadow:
+    0 0 10px rgba(255, 230, 150, 0.95),
+    0 0 30px rgba(255, 190, 80, 0.8);
+
+  animation:
+    magicPulse 1.1s ease-in-out infinite;
+}
+
+
+/* =========================
+   魔法陣アニメーション
+========================= */
+
+@keyframes magicRotate {
+
+  from {
+    transform:
+      translate(-50%, -50%)
+      rotate(0deg);
+  }
+
+  to {
+    transform:
+      translate(-50%, -50%)
+      rotate(360deg);
+  }
+
+}
+
+
+@keyframes magicRotateReverse {
+
+  from {
+    transform:
+      translate(-50%, -50%)
+      rotate(360deg);
+  }
+
+  to {
+    transform:
+      translate(-50%, -50%)
+      rotate(0deg);
+  }
+
+}
+
+
+@keyframes magicPulse {
+
+  0%,
+  100% {
+    opacity: 0.65;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+}
+/* =========================
+   通常召喚：カード出現
+========================= */
+
+/* 召喚開始前はカードを中央に隠しておく */
+.closed-card.summon-waiting {
+  position: relative;
+
+  z-index: 10000;
+
+  opacity: 0;
+
+  transform:
+    translate(
+      var(--summon-x, 0px),
+      var(--summon-y, 0px)
+    )
+    scale(0.15)
+    rotate(-12deg);
+
+  transition: none;
+
+  pointer-events: none;
+}
+
+
+/* 魔法陣から飛び出して最終位置へ移動 */
+.closed-card.summon-flying {
+  position: relative;
+
+  z-index: 10000;
+
+  opacity: 1;
+
+  transform:
+    translate(0, 0)
+    scale(1)
+    rotate(0deg);
+
+  transition:
+    transform 0.48s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.18s ease;
+
+  pointer-events: none;
+
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.35),
+    0 0 16px rgba(255, 225, 150, 0.22);
+}
+
+
+/* 召喚終了後 */
+.closed-card.summon-ready {
+  position: relative;
+
+  z-index: auto;
+
+  opacity: 1;
+
+  transform: none;
+
+  pointer-events: auto;
+}
+/* =========================
+   召喚中はカードを暗転より手前に表示
+========================= */
+
+.card-grid.summon-active {
+  position: relative;
+  z-index: 10000;
+}
+.closed-card.opened .card-result {
+  animation:
+    cardResultPop 0.22s ease-out;
+}
+
+@keyframes cardResultPop {
+
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+}
+/* =========================
+   一括オープン専用
+========================= */
+
+.closed-card.bulk-opening {
+  animation:
+    bulkCardOpen 0.42s ease;
+}
+
+@keyframes bulkCardOpen {
+
+  0% {
+    transform:
+      translateY(0)
+      scale(1)
+      rotateY(0deg);
+  }
+
+  25% {
+    transform:
+      translateY(-3px)
+      scale(1.02)
+      rotateY(0deg);
+  }
+
+  55% {
+    transform:
+      translateY(-3px)
+      scale(1.03)
+      rotateY(90deg);
+  }
+
+  100% {
+    transform:
+      translateY(0)
+      scale(1)
+      rotateY(0deg);
+  }
+}
+/* =========================
+   一括オープン後 NEW 強調
+========================= */
+
+.closed-card.new-highlight {
+  animation:
+    newHighlight 0.7s ease;
+}
+
+@keyframes newHighlight {
+
+  0% {
+    transform: scale(1);
+    box-shadow:
+      0 6px 12px rgba(0, 0, 0, 0.18);
+  }
+
+  35% {
+    transform: scale(1.08);
+
+    box-shadow:
+      0 8px 22px rgba(0, 0, 0, 0.22),
+      0 0 16px rgba(255, 255, 255, 0.9),
+      0 0 28px rgba(255, 220, 100, 0.7);
+  }
+
+  65% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+
+    box-shadow:
+      0 6px 12px rgba(0, 0, 0, 0.18);
+  }
+
+}
+/* =========================
+   ガチャカード画像
+========================= */
+
+.gacha-card-image {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  display: block;
+
+  pointer-events: none;
+}
+
+.card-result {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 4px;
+
+  overflow: hidden;
+}
+
+.result-rarity {
+  position: absolute;
+
+  right: 4px;
+  top: 4px;
+
+  z-index: 2;
+
+  font-size: 11px;
+  font-weight: 900;
+
+  padding: 2px 5px;
+
+  border-radius: 999px;
+
+  background: rgba(0, 0, 0, 0.45);
+  color: white;
+}
+/* =========================
+   アルバムカード画像
+========================= */
+
+.album-card {
+  overflow: hidden;
+}
+
+.album-card-image {
+  width: 100%;
+  height: auto;
+
+  display: block;
+
+  object-fit: contain;
+
+  border-radius: 0;
+}
+.detail-card-image {
+  width: 80%;
+  max-height: 60%;
+
+  object-fit: contain;
+
+  margin: 20px 0;
+}
+
+/* =========================
+   カード詳細画面（完成カード画像向け）
+========================= */
+
+.detail-simple-wrap {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 8px 0 28px;
+}
+
+.detail-main-card-image {
+  width: min(88vw, 360px);
+  height: auto;
+
+  display: block;
+
+  filter:
+    drop-shadow(0 10px 24px rgba(0, 0, 0, 0.22));
+}
+
+.detail-info-block {
+  width: min(88vw, 360px);
+
+  margin-top: 18px;
+
+  background: rgba(255, 255, 255, 0.42);
+
+  border-radius: 18px;
+
+  padding: 18px 16px;
+
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.detail-card-name {
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1.35;
+
+  text-align: center;
+
+  margin-bottom: 18px;
+
+  color: #1f2430;
+}
+
+.detail-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 10px 0;
+
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.detail-meta-row:last-of-type {
+  border-bottom: none;
+}
+
+.detail-meta-label {
+  font-size: 14px;
+  font-weight: 700;
+
+  color: rgba(31, 36, 48, 0.75);
+}
+
+.detail-meta-value {
+  font-size: 18px;
+  font-weight: 900;
+
+  color: #1f2430;
+}
+
+.detail-future-box {
+  margin-top: 18px;
+
+  padding: 14px 12px;
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.58);
+
+  font-size: 14px;
+  line-height: 1.6;
+
+  text-align: center;
+
+  color: rgba(31, 36, 48, 0.8);
+}
+/* =========================
+   ガチャ開封後
+   完成カード画像だけ表示
+========================= */
+
+.closed-card.opened {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  overflow: visible;
+}
+
+.closed-card.opened .card-result {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.closed-card.opened .gacha-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>ファミリーガチャ</title>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <main class="app">
+
+  <!-- ホーム画面 -->
+  <section id="home-screen" class="screen active">
+
+    <div class="home-screen">
+
+      <div class="logo-area">
+        <p class="small-title">FAMILY CARD COLLECTION</p>
+
+        <h1>ファミリーガチャ</h1>
+
+        <p class="catch-copy">
+          家族カードを集めよう！
+        </p>
+      </div>
+
+      <div class="main-card-preview">
+        <div class="preview-card">
+          <div class="preview-question">?</div>
+          <p>WHO'S NEXT?</p>
+        </div>
+      </div>
+
+      <div class="menu">
+
+        <button id="ten-gacha" class="button primary">
+          10連ガチャ
+        </button>
+
+        <button id="album-button" class="button secondary">
+          カードアルバム
+        </button>
+        <button id="reset-album-button" class="button secondary">
+            アルバムをリセット
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- 10連ガチャ画面 -->
+  <section id="gacha-screen" class="screen">
+
+    <div class="gacha-screen">
+
+      <div class="gacha-header">
+
+        <button id="back-home" class="back-button">
+          ←
+        </button>
+
+        <h2>10連ガチャ</h2>
+
+      </div>
+
+        <p class="gacha-message">
+            好きなカードを選んでオープン！
+        </p>
+
+        <div id="card-grid" class="card-grid">
+
+            <button class="closed-card">
+            <span>?</span>
+            </button>
+
+            <button class="closed-card">
+            <span>?</span>
+            </button>
+
+            <button class="closed-card">
+            <span>?</span>
+            </button>
+
+            <button class="closed-card">
+            <span>?</span>
+            </button>
+
+            <button class="closed-card">
+            <span>?</span>
+            </button>
+
+            <button class="closed-card">
+            <span>?</span>
+            </button>
+
+            <button class="closed-card">
+            <span>?</span>
+            </button>
+
+            <button class="closed-card">
+            <span>?</span>
+            </button>
+
+            <button class="closed-card">
+            <span>?</span>
+            </button>
+
+            <button class="closed-card">
+            <span>?</span>
+            </button>
+
+        </div>
+        <div id="open-all-area" class="open-all-area">
+
+  <button id="open-all-button" class="button secondary">
+    一括オープン
+  </button>
+
+</div>
+        <div id="after-gacha-area" class="result-button-area">
+
+  <button id="retry-gacha-button" class="result-button">
+    もう一度10連
+  </button>
+
+  <button id="gacha-album-button" class="button secondary">
+    カードアルバムへ
+  </button>
+
+  <button id="gacha-home-button" class="button secondary">
+    ホームへ
+  </button>
+
+</div>
+
+    </div>
+
+  </section>
+  <!-- リザルト画面 -->
+  <section id="result-screen" class="screen">
+
+    <div class="gacha-screen">
+
+      <div class="gacha-header">
+
+        <h2>ガチャ結果</h2>
+
+      </div>
+
+      <p class="gacha-message">
+        今回の10枚はこちら！
+      </p>
+
+      <div id="result-grid" class="result-grid"></div>
+
+      <div class="result-button-area show">
+
+        <button id="result-album-button" class="result-button">
+          カードアルバムへ
+        </button>
+
+        <button id="result-home-button" class="button secondary">
+          ホームへ
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- アルバム画面 -->
+  <section id="album-screen" class="screen">
+
+    <div class="gacha-screen">
+
+      <div class="gacha-header">
+
+        <button id="album-back-home" class="back-button">
+          ←
+        </button>
+
+        <h2>カードアルバム</h2>
+
+      </div>
+
+      <p id="album-count" class="gacha-message"></p>
+
+<div class="album-controls">
+
+  <label for="album-sort">
+    並び替え
+  </label>
+
+  <select id="album-sort">
+
+    <option value="rarity">
+      レア度順
+    </option>
+
+    <option value="number">
+      カード番号順
+    </option>
+
+    <option value="obtained">
+      入手順
+    </option>
+
+    <option value="count">
+      所持数順
+    </option>
+
+  </select>
+
+</div>
+
+<div id="album-grid" class="album-grid"></div>
+
+    </div>
+
+  </section>
+
+  <!-- カード詳細画面 -->
+<section id="detail-screen" class="screen">
+
+  <div class="gacha-screen">
+
+    <div class="gacha-header">
+
+      <button id="detail-back" class="back-button">
+        ←
+      </button>
+
+      <h2>カード詳細</h2>
+
+    </div>
+
+    <div id="detail-card-area"></div>
+
+  </div>
+
+</section>
+
+</main>
+    <div id="summon-overlay" class="summon-overlay">
+
+  <div id="magic-circle" class="magic-circle">
+
+    <div class="magic-ring ring-outer"></div>
+
+    <div class="magic-ring ring-middle"></div>
+
+    <div class="magic-ring ring-inner"></div>
+
+    <div class="magic-symbol">
+      ✦
+    </div>
+
+  </div>
+
+</div>
+
+    <script src="cards.js"></script>
+    <script src="summon.js"></script>
+    <script src="app.js"></script>
+
+</body>
+</html>
