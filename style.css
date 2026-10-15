@@ -1164,192 +1164,40 @@ h1 {
   pointer-events: auto;
 }
 /* =========================
-   通常召喚：魔法陣
+   通常召喚：青いPNG魔法陣
+   外側：出現/消失、内側：回転
 ========================= */
-
 .magic-circle {
   position: absolute;
-
   left: 50%;
   top: 50%;
-
-  width: min(62vw, 280px);
+  width: min(74vw, 340px);
   aspect-ratio: 1;
-
-  transform:
-    translate(-50%, -50%)
-    scale(0.65);
-
+  transform: translate(-50%, -50%) scale(0.65);
   opacity: 0;
-
   pointer-events: none;
-
-  transition:
-    opacity 0.35s ease,
-    transform 0.45s ease;
-
-  filter:
-    drop-shadow(0 0 10px rgba(255, 220, 120, 0.7))
-    drop-shadow(0 0 24px rgba(255, 180, 80, 0.45));
+  transition: opacity 0.35s ease, transform 0.45s ease;
+  filter: drop-shadow(0 0 12px rgba(36, 189, 255, 0.65))
+          drop-shadow(0 0 24px rgba(15, 115, 255, 0.35));
+}
+.magic-circle.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
 }
 .magic-circle.hiding {
   opacity: 0;
-
-  transform:
-    translate(-50%, -50%)
-    scale(0.35);
+  transform: translate(-50%, -50%) scale(0.35);
 }
-
-
-/* 表示状態 */
-
-.magic-circle.show {
-  opacity: 1;
-
-  transform:
-    translate(-50%, -50%)
-    scale(1);
-}
-
-
-/* =========================
-   魔法陣のリング
-========================= */
-
-.magic-ring {
-  position: absolute;
-
-  left: 50%;
-  top: 50%;
-
-  border-radius: 50%;
-
-  border:
-    2px solid rgba(255, 225, 150, 0.9);
-
-  transform:
-    translate(-50%, -50%);
-
-  box-shadow:
-    inset 0 0 12px rgba(255, 220, 150, 0.25),
-    0 0 12px rgba(255, 210, 120, 0.4);
-}
-
-
-/* 外側 */
-
-.ring-outer {
+.magic-circle-image {
+  display: block;
   width: 100%;
   height: 100%;
-
-  border-width: 3px;
-
-  animation:
-    magicRotate 6s linear infinite;
+  object-fit: contain;
+  animation: summonBlueRotate 8s linear infinite;
 }
-
-
-/* 真ん中 */
-
-.ring-middle {
-  width: 72%;
-  height: 72%;
-
-  border-style: dashed;
-
-  animation:
-    magicRotateReverse 4s linear infinite;
-}
-
-
-/* 内側 */
-
-.ring-inner {
-  width: 42%;
-  height: 42%;
-
-  border-width: 2px;
-
-  animation:
-    magicPulse 1.1s ease-in-out infinite;
-}
-
-
-/* =========================
-   中央シンボル
-========================= */
-
-.magic-symbol {
-  position: absolute;
-
-  left: 50%;
-  top: 50%;
-
-  transform:
-    translate(-50%, -50%);
-
-  color: #ffe8a0;
-
-  font-size: 72px;
-
-  text-shadow:
-    0 0 10px rgba(255, 230, 150, 0.95),
-    0 0 30px rgba(255, 190, 80, 0.8);
-
-  animation:
-    magicPulse 1.1s ease-in-out infinite;
-}
-
-
-/* =========================
-   魔法陣アニメーション
-========================= */
-
-@keyframes magicRotate {
-
-  from {
-    transform:
-      translate(-50%, -50%)
-      rotate(0deg);
-  }
-
-  to {
-    transform:
-      translate(-50%, -50%)
-      rotate(360deg);
-  }
-
-}
-
-
-@keyframes magicRotateReverse {
-
-  from {
-    transform:
-      translate(-50%, -50%)
-      rotate(360deg);
-  }
-
-  to {
-    transform:
-      translate(-50%, -50%)
-      rotate(0deg);
-  }
-
-}
-
-
-@keyframes magicPulse {
-
-  0%,
-  100% {
-    opacity: 0.65;
-  }
-
-  50% {
-    opacity: 1;
-  }
-
+@keyframes summonBlueRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 /* =========================
    通常召喚：カード出現
