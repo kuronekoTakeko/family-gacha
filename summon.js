@@ -107,7 +107,10 @@ function summonCardsFromCircle(cardElements) {
     const gridRect = summonCardGrid.getBoundingClientRect();
     const gridCenterY = gridRect.top + gridRect.height / 2;
     const centerOffset = centerY - gridCenterY;
-    summonCardGrid.style.transform = `translateY(${centerOffset}px)`;
+
+    // marginTop changes the actual layout (unlike transform), so the
+    // open-all button remains below the two rows of cards.
+    summonCardGrid.style.marginTop = `${centerOffset}px`;
 
 
     // 各カードについて、
