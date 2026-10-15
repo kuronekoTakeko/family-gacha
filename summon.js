@@ -10,6 +10,9 @@ const magicCircle =
   document.getElementById(
     "card-grid"
   );
+// 召喚演出中だけ全体を少し下げる（開封待ちの位置は変えない）
+const summonVisualOffsetY = 24;
+
 const summonSound =
   new Audio("sounds/summon.mp3");
 // =========================
@@ -35,6 +38,10 @@ function startSummonBlackout() {
 
 function endSummonBlackout() {
 
+  // 演出専用の移動を解除。カードの通常レイアウトは維持する。
+  magicCircle.style.top = "";
+  summonCardGrid.style.transform = "none";
+
   summonOverlay.classList.remove(
     "active"
   );
@@ -46,6 +53,9 @@ function endSummonBlackout() {
 // =========================
 
 function showMagicCircle() {
+
+  // 固定配置の魔法陣は演出中だけ下へ移動する。
+  magicCircle.style.top = `calc(50% + ${summonVisualOffsetY}px)`;
 
   magicCircle.classList.add(
     "show"
@@ -106,11 +116,14 @@ function summonCardsFromCircle(cardElements) {
 
     const gridRect = summonCardGrid.getBoundingClientRect();
     const gridCenterY = gridRect.top + gridRect.height / 2;
-    const centerOffset = centerY - gridCenterY;
+    const centerOffset = centerY - gridCenterY - summonVisualOffsetY;
 
     // marginTop changes the actual layout (unlike transform), so the
     // open-all button remains below the two rows of cards.
     summonCardGrid.style.marginTop = `${centerOffset}px`;
+
+    // カードだけ見た目を下げる。通常のボタン配置には影響させない。
+    summonCardGrid.style.transform = `translateY(${summonVisualOffsetY}px)`;
 
 
     // 各カードについて、
