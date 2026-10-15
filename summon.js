@@ -94,21 +94,20 @@ function summonCardsFromCircle(cardElements) {
       Array.from(cardElements);
 
 
-    // 10枚のカードの2段の中心を、魔法陣の中心（画面中央）に合わせる。
-    // 画面幅によってカードの高さが変わるため、実寸から余白を計算する。
-    // 毎回ゼロから計算し、連続ガチャで余白が増えないようにする。
+    // 実機の表示領域を基準に、魔法陣とカード2段の中心を揃える。
+    // marginTop は画面やスクロールの状態に左右されることがあるため、
+    // 見た目の座標を直接測って上下両方向に補正する。
     summonCardGrid.style.marginTop = "0px";
+    summonCardGrid.style.transform = "none";
+
+    const circleRect = magicCircle.getBoundingClientRect();
+    const centerX = circleRect.left + circleRect.width / 2;
+    const centerY = circleRect.top + circleRect.height / 2;
+
     const gridRect = summonCardGrid.getBoundingClientRect();
     const gridCenterY = gridRect.top + gridRect.height / 2;
-    const centerOffset = Math.max(0, window.innerHeight / 2 - gridCenterY);
-    summonCardGrid.style.marginTop = `${centerOffset}px`;
-
-    // 魔法陣の中心
-    const centerX =
-      window.innerWidth / 2;
-
-    const centerY =
-      window.innerHeight / 2;
+    const centerOffset = centerY - gridCenterY;
+    summonCardGrid.style.transform = `translateY(${centerOffset}px)`;
 
 
     // 各カードについて、
