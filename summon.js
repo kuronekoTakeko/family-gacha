@@ -40,8 +40,7 @@ function startSummonBlackout() {
 
 function endSummonBlackout() {
 
-  // 演出専用の移動を解除。カードの通常レイアウトは維持する。
-  magicCircle.style.top = "";
+  // 召喚中の一時的な位置補正を戻す（通常レイアウトは維持）。
   summonCardGrid.style.transform = "none";
   summonOpenAllArea.style.visibility = "";
 
@@ -51,14 +50,29 @@ function endSummonBlackout() {
 
 }
 
+// 魔法陣は座標計算を他の要素に依存させず、表示画面の中央へ固定する。
+function updateSummonCircleCenter() {
+  const view = window.visualViewport;
+  const cx = view ? view.offsetLeft + view.width / 2 : window.innerWidth / 2;
+  const cy = view ? view.offsetTop + view.height / 2 : window.innerHeight / 2;
+  magicCircle.style.position = "fixed";
+  magicCircle.style.left = `${cx}px`;
+  magicCircle.style.top = `${cy}px`;
+}
+window.addEventListener("resize", updateSummonCircleCenter);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", updateSummonCircleCenter);
+  window.visualViewport.addEventListener("scroll", updateSummonCircleCenter);
+}
+
 // =========================
 // 魔法陣表示
 // =========================
 
 function showMagicCircle() {
 
-  // 魔法陣はビューポートのちょうど中央に固定する。
-  magicCircle.style.top = "50%";
+  // 実際に見えている画面の中央へ（ブラウザUIの伸縮にも対応）。
+  updateSummonCircleCenter();
 
   magicCircle.classList.add(
     "show"
@@ -107,26 +121,24 @@ function summonCardsFromCircle(cardElements) {
       Array.from(cardElements);
 
 
-    // 実機の表示領域を基準に、魔法陣とカード2段の中心を揃える。
-    // marginTop は画面やスクロールの状態に左右されることがあるため、
-    // 見た目の座標を直接測って上下両方向に補正する。
+    updateSummonCircleCenter();
+    // 召喚終了後に残すレイアウトは、前回正常だった方式を維持。
     summonCardGrid.style.marginTop = "0px";
     summonCardGrid.style.transform = "none";
-
     const circleRect = magicCircle.getBoundingClientRect();
     const centerX = circleRect.left + circleRect.width / 2;
     const centerY = circleRect.top + circleRect.height / 2;
-
     const gridRect = summonCardGrid.getBoundingClientRect();
-    const gridCenterY = gridRect.top + gridRect.height / 2;
-    const centerOffset = centerY - gridCenterY;
+    summonCardGrid.style.marginTop = `${centerY - (gridRect.top + gridRect.height / 2)}px`;
 
-    // marginTop changes the actual layout (unlike transform), so the
-    // open-all button remains below the two rows of cards.
-    summonCardGrid.style.marginTop = `${centerOffset}px`;
-
-    // カードをtransformで移動させない。ボタンは通常のレイアウトに続く。
-
+    // 召喚中だけ「カードそのもの」の上下2段の中央と魔法陣中心を一致させる。
+    // paddingやボタンの位置は変更せず、終了時にtransformを解除する。
+    const firstRect = cards[0].getBoundingClientRect();
+    const lastRect = cards[cards.length - 1].getBoundingClientRect();
+    const rowsCenterY = ((firstRect.top + firstRect.height / 2) +
+                         (lastRect.top + lastRect.height / 2)) / 2;
+    const temporaryOffset = centerY - rowsCenterY;
+    summonCardGrid.style.transform = `translateY(${temporaryOffset}px)`;
 
     // 各カードについて、
     // 現在位置から魔法陣中心までの距離を計算
@@ -236,3 +248,8 @@ function summonCardsFromCircle(cardElements) {
   });
 
 }
+// STEP 7: 新しい summon.js が読み込まれたことを画面で確認する。
+(function () {
+  const badge = document.getElementById("version-check-badge");
+  if (badge) badge.textContent = "TEST -7 / JS OK";
+})();
