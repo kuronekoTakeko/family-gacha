@@ -111,18 +111,13 @@ function hideMagicCircle() {
 // =========================
 
 function summonCardsFromCircle(cardElements) {
-
   return new Promise(function(resolve) {
-        summonCardGrid.classList.add(
-      "summon-active"
-    );
-
-    const cards =
-      Array.from(cardElements);
-
+    summonCardGrid.classList.add("summon-active");
+    const cards = Array.from(cardElements);
+    if (!cards.length) { resolve(); return; }
 
     updateSummonCircleCenter();
-    // 召喚終了後に残すレイアウトは、前回正常だった方式を維持。
+    // 完成済みの開封待ち画面の配置は維持する。
     summonCardGrid.style.marginTop = "0px";
     summonCardGrid.style.transform = "none";
     const circleRect = magicCircle.getBoundingClientRect();
@@ -131,125 +126,116 @@ function summonCardsFromCircle(cardElements) {
     const gridRect = summonCardGrid.getBoundingClientRect();
     summonCardGrid.style.marginTop = `${centerY - (gridRect.top + gridRect.height / 2)}px`;
 
-    // 召喚中だけ「カードそのもの」の上下2段の中央と魔法陣中心を一致させる。
-    // paddingやボタンの位置は変更せず、終了時にtransformを解除する。
     const firstRect = cards[0].getBoundingClientRect();
     const lastRect = cards[cards.length - 1].getBoundingClientRect();
     const rowsCenterY = ((firstRect.top + firstRect.height / 2) +
                          (lastRect.top + lastRect.height / 2)) / 2;
-    const temporaryOffset = centerY - rowsCenterY;
-    summonCardGrid.style.transform = `translateY(${temporaryOffset}px)`;
+    summonCardGrid.style.transform = `translateY(${centerY - rowsCenterY}px)`;
 
-    // 各カードについて、
-    // 現在位置から魔法陣中心までの距離を計算
-    cards.forEach(function(card) {
+    // 実際の表示領域の左上寄りに、カード全体が収まる集結位置を設定。
+    const viewport = window.visualViewport;
+    const vLeft = viewport ? viewport.offsetLeft : 0;
+    const vTop = viewport ? viewport.offsetTop : 0;
+    const vWidth = viewport ? viewport.width : window.innerWidth;
+    const vHeight = viewport ? viewport.height : window.innerHeight;
+    const baseRect = cards[0].getBoundingClientRect();
+    const margin = 14;
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    const stackX = clamp(vLeft + vWidth * 0.19, vLeft + margin + baseRect.width / 2,
+                         vLeft + vWidth - margin - baseRect.width / 2);
+    const stackY = clamp(vTop + vHeight * 0.20, vTop + margin + baseRect.height / 2,
+                         vTop + vHeight - margin - baseRect.height / 2);
+    const intervals = 300;
+    const arcDuration = 420;
+    const fanDuration = 440;
+    const activeAnimations = [];
 
-      const rect =
-        card.getBoundingClientRect();
+    // キーフレームの座標は各カードの通常位置に対する相対移動量。
+    const makeTransform = (x, y, scale, deg) =>
+      `translate(${x}px, ${y}px) scale(${scale}) rotate(${deg}deg)`;
 
-      const cardCenterX =
-        rect.left + rect.width / 2;
+    const rects = cards.map(card => card.getBoundingClientRect());
+    const starts = rects.map(rect => ({
+      x: centerX - (rect.left + rect.width / 2),
+      y: centerY - (rect.top + rect.height / 2)
+    }));
+    const stacks = rects.map((rect, index) => ({
+      x: stackX - (rect.left + rect.width / 2) + (index % 3) * 2,
+      y: stackY - (rect.top + rect.height / 2) + (index % 3) * 2,
+      angle: (index % 5 - 2) * 1.4
+    }));
 
-      const cardCenterY =
-        rect.top + rect.height / 2;
-
-
-      const startX =
-        centerX - cardCenterX;
-
-      const startY =
-        centerY - cardCenterY;
-
-
-      card.style.setProperty(
-        "--summon-x",
-        `${startX}px`
-      );
-
-      card.style.setProperty(
-        "--summon-y",
-        `${startY}px`
-      );
-
-
-      card.classList.remove(
-        "summon-flying",
-        "summon-ready"
-      );
-
-      card.classList.add(
-        "summon-waiting"
-      );
-
+    cards.forEach(card => {
+      card.classList.remove("summon-flying", "summon-ready");
+      card.classList.add("summon-waiting");
     });
 
+    function animateArc(card, index) {
+      const start = starts[index];
+      const end = stacks[index];
+      // 魔法陣から浮き上がり、左側を回り込んで集結するカーブ。
+      // 途中地点を複数設けて、直線移動ではなく弧を描かせる。
+      const midpointX = (centerX + stackX) / 2;
+      const midpointY = (centerY + stackY) / 2;
+      const controlX = Math.min(centerX, stackX) - Math.min(62, vWidth * 0.10);
+      const controlY = midpointY + Math.min(42, vHeight * 0.055);
+      const points = [0, 0.2, 0.4, 0.55, 0.7, 0.85, 1].map((t, n) => {
+        let x, y;
+        if (t <= 0.2) {
+          x = centerX;
+          y = centerY - 18 * (t / 0.2);
+        } else {
+          const u = (t - 0.2) / 0.8;
+          const sx = centerX, sy = centerY - 18;
+          x = (1-u)*(1-u)*sx + 2*(1-u)*u*controlX + u*u*stackX;
+          y = (1-u)*(1-u)*sy + 2*(1-u)*u*controlY + u*u*stackY;
+        }
+        const rect = rects[index];
+        return {offset: t,
+          transform: makeTransform(x - (rect.left + rect.width/2) + (t===1 ? (index%3)*2 : 0),
+                                   y - (rect.top + rect.height/2) + (t===1 ? (index%3)*2 : 0),
+                                   0.27 + t * 0.57, t * end.angle),
+          opacity: t===0 ? 0 : 1};
+      });
+      const animation = card.animate(points, {
+        duration: arcDuration, easing: "ease-in-out", fill: "forwards"
+      });
+      activeAnimations[index] = animation;
+      // 最終地点は fill:forwards によって集結するまで保持される。
+    }
 
-    // ブラウザに初期位置を一度描画させる
-    requestAnimationFrame(function() {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      cards.forEach((card, index) => {
+        setTimeout(() => animateArc(card, index), index * intervals);
+      });
+    }));
 
-      requestAnimationFrame(function() {
-
-        cards.forEach(function(card, index) {
-
-          // トランプを配るように220ms間隔で1枚ずつ飛び出す
-          setTimeout(function() {
-
-            card.classList.remove(
-              "summon-waiting"
-            );
-
-            card.classList.add(
-              "summon-flying"
-            );
-
-          }, index * 220);
-
+    // 最後のカードが束に着地するまで待ってから、一斉に展開。
+    const stackCompleteAt = (cards.length - 1) * intervals + arcDuration + 50;
+    setTimeout(() => {
+      cards.forEach((card, index) => {
+        if (activeAnimations[index]) activeAnimations[index].cancel();
+        const end = stacks[index];
+        const animation = card.animate([
+          { transform: makeTransform(end.x, end.y, 0.84, end.angle), opacity: 1 },
+          { transform: makeTransform(end.x * 0.35, end.y * 0.35, 1.04, 0), opacity: 1, offset: 0.7 },
+          { transform: makeTransform(0, 0, 1, 0), opacity: 1 }
+        ], { duration: fanDuration, easing: "cubic-bezier(0.2,0.8,0.2,1)", fill: "forwards" });
+        activeAnimations[index] = animation;
+      });
+      setTimeout(() => {
+        cards.forEach((card, index) => {
+          card.classList.remove("summon-waiting", "summon-flying");
+          card.classList.add("summon-ready");
+          if (activeAnimations[index]) activeAnimations[index].cancel();
         });
-
-      });
-
-    });
-
-
-    // 10枚すべて整列したら通常状態に戻す
-    const totalTime =
-      (cards.length - 1) * 220 + 550;
-
-
-    setTimeout(function() {
-
-      cards.forEach(function(card) {
-
-        card.classList.remove(
-          "summon-waiting",
-          "summon-flying"
-        );
-
-        card.classList.add(
-          "summon-ready"
-        );
-
-
-        card.style.removeProperty(
-          "--summon-x"
-        );
-
-        card.style.removeProperty(
-          "--summon-y"
-        );
-
-      });
-
-
-      resolve();
-
-    }, totalTime);
-
+        resolve();
+      }, fanDuration + 40);
+    }, stackCompleteAt);
   });
-
 }
-// STEP 7: 新しい summon.js が読み込まれたことを画面で確認する。
+// STEP 11: 新しい summon.js が読み込まれたことを画面で確認する。
 (function () {
   const badge = document.getElementById("version-check-badge");
-  if (badge) badge.textContent = "TEST -7 / JS OK";
+  if (badge) badge.textContent = "TEST -11 / JS OK";
 })();

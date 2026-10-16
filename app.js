@@ -1013,7 +1013,7 @@ function startTenGacha() {
 
     }, 450);
 
-  }, 3050); // STEP 9: 魔法陣出現(550ms)から約2.5秒ためて召喚
+  }, 2250); // STEP 11: 魔法陣出現(550ms)から約1.7秒ためて召喚
 
 }
 
@@ -1473,4 +1473,4 @@ gachaHomeButton.addEventListener(
   }
 );
 // STEP 8の読み込み確認（画像最適化＋先読み）
-(function(){const b=document.getElementById("version-check-badge");if(b)b.textContent="TEST -10 / JS OK";})();
+(function(){const b=document.getElementById("version-check-badge");if(b)b.textContent="TEST -11 / JS OK";})();
