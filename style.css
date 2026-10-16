@@ -1632,3 +1632,41 @@ body.individual-reveal-active { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .individual-reveal-effect, .individual-reveal-card, .individual-reveal-card.revealed { animation: none; }
 }
+
+
+/* =========================
+   STEP 16: SR用の紫エフェクト（カードの背後のみ）
+   既存CSSの発光や他レアリティの演出は変更しない。
+   カードを隠さず、惑星の軌道のようにゆっくり回す。
+========================= */
+.individual-reveal-sr-orbit {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 20px); /* 下の「タップして戻る」の高さ分だけカード中心に寄せる */
+  width: min(115vw, 500px, 63vh);
+  aspect-ratio: 1 / 1;
+  z-index: 0; /* 個別開封カード(z-index:1)より後ろ */
+  pointer-events: none;
+  background: url("images/effects/sr-purple-orbit.webp") center / contain no-repeat;
+  display: none;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+}
+.individual-reveal.active.rarity-SR .individual-reveal-sr-orbit {
+  display: block;
+  animation: srPlanetOrbit 9s linear infinite;
+}
+@keyframes srPlanetOrbit {
+  0%   { opacity: .44; transform: translate(-50%, -50%) rotate(0deg) scale(.96); }
+  28%  { opacity: .62; }
+  55%  { opacity: .55; }
+  78%  { opacity: .63; }
+  100% { opacity: .44; transform: translate(-50%, -50%) rotate(360deg) scale(.96); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .individual-reveal.active.rarity-SR .individual-reveal-sr-orbit {
+    animation: none;
+    opacity: .48;
+    transform: translate(-50%, -50%) scale(.96);
+  }
+}
