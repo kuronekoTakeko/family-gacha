@@ -145,10 +145,10 @@ function summonCardsFromCircle(cardElements) {
                          vLeft + vWidth - margin - baseRect.width / 2);
     const stackY = clamp(vTop + vHeight * 0.20, vTop + margin + baseRect.height / 2,
                          vTop + vHeight - margin - baseRect.height / 2);
-    const intervals = 300;
-    const arcDuration = 600; // 出現0.14秒 + 静止0.20秒 + 弧を描く飛行0.26秒
+    const intervals = 450; // 1枚ずつの召喚に少し余裕を設ける
+    const arcDuration = 920; // 出現0.14秒 + 中央拡大0.17秒 + 静止0.35秒 + 飛行0.26秒
     const fanDuration = 440;
-    const stackPause = 520; // 10枚集結後に約0.5秒静止
+    const stackPause = 750; // 10枚集結後に約0.75秒静止
     const activeAnimations = [];
 
     // キーフレームの座標は各カードの通常位置に対する相対移動量。
@@ -179,32 +179,40 @@ function summonCardsFromCircle(cardElements) {
       const midpointY = (centerY + stackY) / 2;
       const controlX = Math.min(centerX, stackX) - Math.min(62, vWidth * 0.10);
       const controlY = midpointY + Math.min(42, vHeight * 0.055);
-      // キーフレームの 0.233〜0.567 の間は、座標とサイズを同一にして
-      // 「魔法陣の上にカードがとどまる」時間を明確に確保する。
-      const spawnEnd = 140 / arcDuration;
-      const pauseEnd = 340 / arcDuration;
-      const timeline = [0, spawnEnd, pauseEnd, 0.69, 0.81, 0.92, 1];
+      // STEP 13: 魔法陣中央で「出現→集結サイズまで拡大→じゃーん！と静止」、
+      // その後にだけ左上へカーブ飛行。移動中はカードを拡大しない。
+      const appearEnd = 140 / arcDuration;
+      const growEnd = 310 / arcDuration;
+      const holdEnd = 660 / arcDuration;
+      const timeline = [0, appearEnd, growEnd, holdEnd, 0.83, 0.93, 1];
       const rect = rects[index];
       const hoverX = centerX;
       const hoverY = centerY - 18;
+      const fullScale = 0.84; // 左上で積み重なるサイズと一致
       const points = timeline.map(t => {
         let x, y, scale, angle;
-        if (t <= spawnEnd) {
-          const u = t / spawnEnd;
+        if (t <= appearEnd) {
+          const u = t / appearEnd;
           x = centerX;
           y = centerY - 18 * u;
           scale = 0.22 + 0.31 * u;
           angle = 0;
-        } else if (t <= pauseEnd) {
+        } else if (t <= growEnd) {
+          const u = (t - appearEnd) / (growEnd - appearEnd);
           x = hoverX;
           y = hoverY;
-          scale = 0.53;
+          scale = 0.53 + (fullScale - 0.53) * u;
+          angle = 0;
+        } else if (t <= holdEnd) {
+          x = hoverX;
+          y = hoverY;
+          scale = fullScale;
           angle = 0;
         } else {
-          const u = (t - pauseEnd) / (1 - pauseEnd);
+          const u = (t - holdEnd) / (1 - holdEnd);
           x = (1-u)*(1-u)*hoverX + 2*(1-u)*u*controlX + u*u*stackX;
           y = (1-u)*(1-u)*hoverY + 2*(1-u)*u*controlY + u*u*stackY;
-          scale = 0.53 + 0.31 * u;
+          scale = fullScale;
           angle = u * end.angle;
         }
         const landed = t === 1 ? (index % 3) * 2 : 0;
@@ -229,7 +237,7 @@ function summonCardsFromCircle(cardElements) {
       });
     }));
 
-    // 最後のカードが束に着地し、約0.5秒とどまってから一斉展開。
+    // 最後のカードが束に着地し、約0.75秒とどまってから一斉展開。
     const stackCompleteAt = (cards.length - 1) * intervals + arcDuration + 50;
     setTimeout(() => {
       cards.forEach((card, index) => {
@@ -253,8 +261,8 @@ function summonCardsFromCircle(cardElements) {
     }, stackCompleteAt + stackPause);
   });
 }
-// STEP 12: 新しい summon.js が読み込まれたことを画面で確認する。
+// STEP 13: 新しい summon.js が読み込まれたことを画面で確認する。
 (function () {
   const badge = document.getElementById("version-check-badge");
-  if (badge) badge.textContent = "TEST -12 / JS OK";
+  if (badge) badge.textContent = "TEST -13 / JS OK";
 })();
