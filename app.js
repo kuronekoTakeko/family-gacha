@@ -998,11 +998,8 @@ function startTenGacha() {
     );
 
 
-    // ⑤ 魔法陣を縮めながら消す
-    hideMagicCircle();
-
-
-    // ⑥ 魔法陣が消えたあと暗転解除
+    // STEP 15: 魔法陣は最後のカードの集結時にsummon.js側で消し始める。
+    // カード展開が完了したので、暗転だけ解除する。
     setTimeout(function() {
 
       endSummonBlackout();
@@ -1011,9 +1008,9 @@ function startTenGacha() {
         "summon-active"
       );
 
-    }, 450);
+    }, 130);
 
-  }, 2250); // STEP 11: 魔法陣出現(550ms)から約1.7秒ためて召喚
+  }, 1950); // STEP 15: 魔法陣出現(550ms)から約1.4秒ためて召喚
 
 }
 
@@ -1491,4 +1488,4 @@ gachaHomeButton.addEventListener(
   }
 );
 // STEP 8の読み込み確認（画像最適化＋先読み）
-(function(){const b=document.getElementById("version-check-badge");if(b)b.textContent="TEST -14 / JS OK";})();
+(function(){const b=document.getElementById("version-check-badge");if(b)b.textContent="TEST -15 / JS OK";})();

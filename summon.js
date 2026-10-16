@@ -145,12 +145,12 @@ function summonCardsFromCircle(cardElements) {
                          vLeft + vWidth - margin - baseRect.width / 2);
     const stackY = clamp(vTop + vHeight * 0.20, vTop + margin + baseRect.height / 2,
                          vTop + vHeight - margin - baseRect.height / 2);
-    // 1枚目が中央を離れるまで次のカードを出さない。
-    // STEP 13の450msでは中央演出(約660ms)が重なり、2枚目以降の拡大が見えにくかった。
-    const intervals = 800;
-    const arcDuration = 900; // 出現0.12秒 + 中央拡大0.18秒 + 停止0.35秒 + 飛行0.25秒
-    const fanDuration = 440;
-    const stackPause = 750; // 10枚集結後に約0.75秒静止
+    // STEP 15: 各カードの「じゃーん！」は残しつつ、全体を約1.2～1.3倍速へ。
+    // 次のカードは、前のカードが中央を離れてから召喚する。
+    const intervals = 650;
+    const arcDuration = 760; // 出現0.10秒 + 中央拡大0.16秒 + 停止0.295秒 + 飛行0.205秒
+    const fanDuration = 360;
+    const stackPause = 600; // 集結後：魔法陣が消え終わる余裕を取ってから展開
     const activeAnimations = [];
 
     // キーフレームの座標は各カードの通常位置に対する相対移動量。
@@ -180,9 +180,9 @@ function summonCardsFromCircle(cardElements) {
       const controlY = midpointY + Math.min(42, vHeight * 0.055);
       // STEP 14: 全10枚が同じ「小さく出現→下から上へ拡大→じゃーんと停止→飛行」。
       // カードの下端を動かさず拡大するため、上へせり上がるように見える。
-      const appearEnd = 120 / arcDuration;
-      const growEnd = 300 / arcDuration;
-      const holdEnd = 650 / arcDuration;
+      const appearEnd = 100 / arcDuration;
+      const growEnd = 260 / arcDuration;
+      const holdEnd = 555 / arcDuration;
       const timeline = [0, appearEnd, growEnd, holdEnd, 0.84, 0.93, 1];
       const rect = rects[index];
       const hoverX = centerX;
@@ -239,9 +239,12 @@ function summonCardsFromCircle(cardElements) {
       });
     }));
 
-    // 最後のカードが束に着地し、約0.75秒とどまってから一斉展開。
+    // 最後のカードが集結したら、魔法陣は役目を終えて消える。
+    // 0.45秒の消失が終わってから一斉展開する（開封待ち画面は変更しない）。
     const stackCompleteAt = (cards.length - 1) * intervals + arcDuration + 50;
     setTimeout(() => {
+      hideMagicCircle();
+      setTimeout(() => {
       cards.forEach((card, index) => {
         if (activeAnimations[index]) activeAnimations[index].cancel();
         const end = stacks[index];
@@ -261,11 +264,12 @@ function summonCardsFromCircle(cardElements) {
         });
         resolve();
       }, fanDuration + 40);
-    }, stackCompleteAt + stackPause);
+      }, stackPause);
+    }, stackCompleteAt);
   });
 }
-// STEP 14: 新しい summon.js が読み込まれたことを画面で確認する。
+// STEP 15: 新しい summon.js が読み込まれたことを画面で確認する。
 (function () {
   const badge = document.getElementById("version-check-badge");
-  if (badge) badge.textContent = "TEST -14 / JS OK";
+  if (badge) badge.textContent = "TEST -15 / JS OK";
 })();
