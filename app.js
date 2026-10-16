@@ -72,6 +72,32 @@ let isOpeningAll = false;
 
 const STORAGE_KEY = "family-gacha-album";
 
+// STEP 8: カード画像の読み込みを共有して先読みする。
+const cardImageLoads = new Map();
+function prepareCardImage(cardData) {
+  if (!cardData) return Promise.resolve("");
+  if (cardImageLoads.has(cardData.id)) return cardImageLoads.get(cardData.id);
+  const load = function(src) {
+    return new Promise(function(resolve, reject) {
+      const image = new Image();
+      image.onload = function() {
+        if (image.decode) {
+          image.decode().then(function(){resolve(src);}, function(){resolve(src);});
+        } else { resolve(src); }
+      };
+      image.onerror = reject;
+      image.src = src;
+    });
+  };
+  const fallback = cardData.image.replace(/\.webp$/i, ".png");
+  const promise = load(cardData.image).catch(function() {
+    return load(fallback).catch(function() {return fallback;});
+  });
+  cardImageLoads.set(cardData.id, promise);
+  return promise;
+}
+
+
 const rarityOrder = {
   UR: 5,
   SSR: 4,
@@ -932,6 +958,12 @@ function startTenGacha() {
   currentGachaResults =
     drawTenCards();
 
+  // 召喚演出中に画像を先読みする（抽選結果は変更しない）。
+  [...new Set(currentGachaResults.map(function(card){return card.id;}))]
+    .forEach(function(id) {
+      prepareCardImage(cardPool.find(function(card){return card.id === id;}));
+    });
+
   // 黒カードを初期状態に戻す
   prepareClosedCards();
 
@@ -1134,7 +1166,8 @@ function openCard(cardElement, isBulk = false) {
     if (
       cardElement.classList.contains("opened") ||
       cardElement.classList.contains("opening") ||
-      cardElement.classList.contains("bulk-opening")
+      cardElement.classList.contains("bulk-opening") ||
+      cardElement.classList.contains("image-preparing")
     ) {
 
       resolve();
@@ -1190,6 +1223,10 @@ if (isNew) {
 }
 
 
+// 同一カードの二重タップを防ぎ、画像準備完了後に開封する。
+cardElement.classList.add("image-preparing");
+prepareCardImage(cardData).then(function(readyImageSrc) {
+cardElement.classList.remove("image-preparing");
 // 開封アニメーション開始
 if (isBulk) {
 
@@ -1232,7 +1269,7 @@ if (isBulk) {
   }
 
   <img
-    src="${cardData.image}"
+    src="${readyImageSrc}"
     alt="${cardName}"
     class="gacha-card-image"
   >
@@ -1275,9 +1312,9 @@ if (isBulk) {
       resolve();
 
     }, finishDelay);
+  }); // prepareCardImage
 
   });
-
 }
 openAllButton.addEventListener(
   "click",
@@ -1301,31 +1338,20 @@ bulkOpenSound.play().catch(function() {});
 
         return (
           !cardElement.classList.contains("opened") &&
-          !cardElement.classList.contains("opening")
+          !cardElement.classList.contains("opening") &&
+          !cardElement.classList.contains("image-preparing")
         );
 
       });
 
 
     // 全カードを同時に開く
-unopenedCards.forEach(function(cardElement) {
-
-  openCard(
-    cardElement,
-    true
-  );
-
-});
-
-
-    // 開封アニメーションが終わった頃に解除
-setTimeout(function() {
-
+Promise.all(unopenedCards.map(function(cardElement) {
+  return openCard(cardElement, true);
+})).then(function() {
   isOpeningAll = false;
-
   highlightNewCards();
-
-}, 520);
+});
 
   }
 );
@@ -1381,3 +1407,5 @@ gachaHomeButton.addEventListener(
 
   }
 );
+// STEP 8の読み込み確認（画像最適化＋先読み）
+(function(){const b=document.getElementById("version-check-badge");if(b)b.textContent="TEST -8 / JS OK";})();
