@@ -1558,3 +1558,77 @@ h1 {
   object-fit: contain;
   display: block;
 }
+/* =========================
+   STEP 9: 個別開封の中央拡大演出
+   レアリティ別PNGは後日追加できる。
+========================= */
+.individual-reveal {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 18px;
+  background: rgba(5, 8, 22, .94);
+  overflow: hidden;
+  isolation: isolate;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.individual-reveal.active { display: flex; }
+.individual-reveal:focus { outline: none; }
+.individual-reveal-effect {
+  position: absolute;
+  width: min(100vw, 520px);
+  aspect-ratio: 1;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.68) 0%, var(--reveal-glow, #7bbdf7) 28%, transparent 70%);
+  opacity: .75;
+  filter: blur(25px);
+  animation: revealGlow 2.8s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+.individual-reveal.rarity-N { --reveal-glow: rgba(151, 188, 215, .4); }
+.individual-reveal.rarity-R { --reveal-glow: rgba(70, 163, 255, .65); }
+.individual-reveal.rarity-SR { --reveal-glow: rgba(178, 95, 255, .8); }
+.individual-reveal.rarity-SSR { --reveal-glow: rgba(255, 196, 51, .9); }
+.individual-reveal.rarity-UR { --reveal-glow: rgba(248, 104, 208, .9); }
+.individual-reveal.rarity-UR .individual-reveal-effect {
+  background: conic-gradient(from 0deg, #ff76d5, #ffdc5e, #73f1ff, #9778ff, #ff76d5);
+  opacity: .42;
+  animation: revealRotate 5s linear infinite;
+}
+.individual-reveal-card {
+  position: relative;
+  z-index: 1;
+  width: min(72vw, 315px, 38vh);
+  aspect-ratio: 3 / 4;
+  border: 3px solid rgba(255,255,255,.72);
+  border-radius: 13px;
+  background: linear-gradient(140deg, #343b52, #11131f);
+  box-shadow: 0 8px 45px var(--reveal-glow, rgba(100,180,255,.5));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(.87);
+  animation: revealAppear .4s ease-out forwards;
+  overflow: visible;
+}
+.individual-card-question { color: #fff; font-size: 48px; }
+.individual-reveal-card.revealed { animation: revealTurn .65s ease-out both; background: transparent; border-color: transparent; }
+.individual-reveal-card .card-result { position: absolute; inset: 0; width: 100%; height: 100%; }
+.individual-reveal-card .gacha-card-image { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: 7px; }
+.individual-reveal-card .gacha-new-badge { position: absolute; z-index: 2; top: -10px; left: -10px; }
+.individual-reveal-hint { position: relative; z-index: 1; color: white; font-size: 15px; font-weight: 700; text-align: center; text-shadow: 0 1px 5px #000; }
+body.individual-reveal-active { overflow: hidden; }
+@keyframes revealGlow { from { opacity:.40; transform:translate(-50%,-50%) scale(.85); } to { opacity:.85; transform:translate(-50%,-50%) scale(1.16); } }
+@keyframes revealRotate { to { transform:translate(-50%,-50%) rotate(360deg); } }
+@keyframes revealAppear { to { transform: scale(1); } }
+@keyframes revealTurn { 0% { transform: scale(.92) rotateY(90deg); opacity:.4; } 100% { transform: scale(1) rotateY(0); opacity:1; } }
+@media (prefers-reduced-motion: reduce) {
+  .individual-reveal-effect, .individual-reveal-card, .individual-reveal-card.revealed { animation: none; }
+}

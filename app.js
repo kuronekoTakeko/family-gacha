@@ -1013,7 +1013,7 @@ function startTenGacha() {
 
     }, 450);
 
-  }, 1200);
+  }, 3050); // STEP 9: 魔法陣出現(550ms)から約2.5秒ためて召喚
 
 }
 
@@ -1054,7 +1054,7 @@ closedCards.forEach(function(cardElement) {
         return;
       }
 
-      openCard(cardElement);
+      showIndividualCardReveal(cardElement);
 
     }
   );
@@ -1316,6 +1316,71 @@ if (isBulk) {
 
   });
 }
+
+// =========================
+// STEP 9: 個別カード拡大開封
+// 一括オープンの既存処理は変更しない。
+// =========================
+const individualReveal = document.getElementById("individual-reveal");
+const individualRevealCard = document.getElementById("individual-reveal-card");
+const individualRevealHint = document.getElementById("individual-reveal-hint");
+let individualRevealBusy = false;
+let individualRevealCanClose = false;
+let individualRevealPreviousFocus = null;
+
+async function showIndividualCardReveal(cardElement) {
+  if (individualRevealBusy || isOpeningAll ||
+      !cardElement || cardElement.classList.contains("opened") ||
+      cardElement.classList.contains("opening") ||
+      cardElement.classList.contains("image-preparing")) return;
+
+  individualRevealBusy = true;
+  individualRevealCanClose = false;
+  individualRevealPreviousFocus = document.activeElement;
+  const rarity = cardElement.dataset.rarity || "N";
+  individualReveal.className = "individual-reveal active rarity-" + rarity;
+  individualReveal.setAttribute("aria-hidden", "false");
+  individualRevealCard.innerHTML = '<span class="individual-card-question">?</span>';
+  individualRevealCard.classList.remove("revealed");
+  individualRevealHint.textContent = "カードを召喚中…";
+  document.body.classList.add("individual-reveal-active");
+  individualReveal.focus();
+
+  // 既存の開封処理をそのまま利用することで、NEW・所持数・保存処理を維持する。
+  // 背面での小さなカードの開封アニメーションは暗幕に隠れる。
+  try {
+    await openCard(cardElement, true);
+    const result = cardElement.querySelector(".card-result");
+    if (result) {
+      individualRevealCard.innerHTML = result.innerHTML;
+    } else {
+      individualRevealCard.textContent = "カードを表示できませんでした";
+    }
+    individualRevealCard.classList.add("revealed");
+    individualRevealHint.textContent = "タップして戻る";
+  } catch (error) {
+    console.error("Individual reveal failed", error);
+    individualRevealHint.textContent = "タップして戻る";
+  }
+  individualRevealCanClose = true;
+}
+
+function closeIndividualCardReveal() {
+  if (!individualRevealBusy || !individualRevealCanClose) return;
+  individualReveal.className = "individual-reveal";
+  individualReveal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("individual-reveal-active");
+  individualRevealBusy = false;
+  individualRevealCanClose = false;
+  if (individualRevealPreviousFocus && individualRevealPreviousFocus.focus) {
+    individualRevealPreviousFocus.focus();
+  }
+}
+individualReveal.addEventListener("click", closeIndividualCardReveal);
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") closeIndividualCardReveal();
+});
+
 openAllButton.addEventListener(
   "click",
   function() {
@@ -1408,4 +1473,4 @@ gachaHomeButton.addEventListener(
   }
 );
 // STEP 8の読み込み確認（画像最適化＋先読み）
-(function(){const b=document.getElementById("version-check-badge");if(b)b.textContent="TEST -8 / JS OK";})();
+(function(){const b=document.getElementById("version-check-badge");if(b)b.textContent="TEST -9 / JS OK";})();
