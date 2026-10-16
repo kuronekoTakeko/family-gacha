@@ -191,7 +191,7 @@ function summonCardsFromCircle(cardElements) {
 
         cards.forEach(function(card, index) {
 
-          // 少しずつ時間差で飛び出す
+          // トランプを配るように220ms間隔で1枚ずつ飛び出す
           setTimeout(function() {
 
             card.classList.remove(
@@ -202,7 +202,7 @@ function summonCardsFromCircle(cardElements) {
               "summon-flying"
             );
 
-          }, index * 70);
+          }, index * 220);
 
         });
 
@@ -213,7 +213,7 @@ function summonCardsFromCircle(cardElements) {
 
     // 10枚すべて整列したら通常状態に戻す
     const totalTime =
-      (cards.length - 1) * 70 + 550;
+      (cards.length - 1) * 220 + 550;
 
 
     setTimeout(function() {
