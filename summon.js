@@ -146,8 +146,9 @@ function summonCardsFromCircle(cardElements) {
     const stackY = clamp(vTop + vHeight * 0.20, vTop + margin + baseRect.height / 2,
                          vTop + vHeight - margin - baseRect.height / 2);
     const intervals = 300;
-    const arcDuration = 420;
+    const arcDuration = 600; // 出現0.14秒 + 静止0.20秒 + 弧を描く飛行0.26秒
     const fanDuration = 440;
+    const stackPause = 520; // 10枚集結後に約0.5秒静止
     const activeAnimations = [];
 
     // キーフレームの座標は各カードの通常位置に対する相対移動量。
@@ -175,27 +176,45 @@ function summonCardsFromCircle(cardElements) {
       const end = stacks[index];
       // 魔法陣から浮き上がり、左側を回り込んで集結するカーブ。
       // 途中地点を複数設けて、直線移動ではなく弧を描かせる。
-      const midpointX = (centerX + stackX) / 2;
       const midpointY = (centerY + stackY) / 2;
       const controlX = Math.min(centerX, stackX) - Math.min(62, vWidth * 0.10);
       const controlY = midpointY + Math.min(42, vHeight * 0.055);
-      const points = [0, 0.2, 0.4, 0.55, 0.7, 0.85, 1].map((t, n) => {
-        let x, y;
-        if (t <= 0.2) {
+      // キーフレームの 0.233〜0.567 の間は、座標とサイズを同一にして
+      // 「魔法陣の上にカードがとどまる」時間を明確に確保する。
+      const spawnEnd = 140 / arcDuration;
+      const pauseEnd = 340 / arcDuration;
+      const timeline = [0, spawnEnd, pauseEnd, 0.69, 0.81, 0.92, 1];
+      const rect = rects[index];
+      const hoverX = centerX;
+      const hoverY = centerY - 18;
+      const points = timeline.map(t => {
+        let x, y, scale, angle;
+        if (t <= spawnEnd) {
+          const u = t / spawnEnd;
           x = centerX;
-          y = centerY - 18 * (t / 0.2);
+          y = centerY - 18 * u;
+          scale = 0.22 + 0.31 * u;
+          angle = 0;
+        } else if (t <= pauseEnd) {
+          x = hoverX;
+          y = hoverY;
+          scale = 0.53;
+          angle = 0;
         } else {
-          const u = (t - 0.2) / 0.8;
-          const sx = centerX, sy = centerY - 18;
-          x = (1-u)*(1-u)*sx + 2*(1-u)*u*controlX + u*u*stackX;
-          y = (1-u)*(1-u)*sy + 2*(1-u)*u*controlY + u*u*stackY;
+          const u = (t - pauseEnd) / (1 - pauseEnd);
+          x = (1-u)*(1-u)*hoverX + 2*(1-u)*u*controlX + u*u*stackX;
+          y = (1-u)*(1-u)*hoverY + 2*(1-u)*u*controlY + u*u*stackY;
+          scale = 0.53 + 0.31 * u;
+          angle = u * end.angle;
         }
-        const rect = rects[index];
-        return {offset: t,
-          transform: makeTransform(x - (rect.left + rect.width/2) + (t===1 ? (index%3)*2 : 0),
-                                   y - (rect.top + rect.height/2) + (t===1 ? (index%3)*2 : 0),
-                                   0.27 + t * 0.57, t * end.angle),
-          opacity: t===0 ? 0 : 1};
+        const landed = t === 1 ? (index % 3) * 2 : 0;
+        return {
+          offset: t,
+          transform: makeTransform(x - (rect.left + rect.width / 2) + landed,
+                                   y - (rect.top + rect.height / 2) + landed,
+                                   scale, angle),
+          opacity: t === 0 ? 0 : 1
+        };
       });
       const animation = card.animate(points, {
         duration: arcDuration, easing: "ease-in-out", fill: "forwards"
@@ -210,7 +229,7 @@ function summonCardsFromCircle(cardElements) {
       });
     }));
 
-    // 最後のカードが束に着地するまで待ってから、一斉に展開。
+    // 最後のカードが束に着地し、約0.5秒とどまってから一斉展開。
     const stackCompleteAt = (cards.length - 1) * intervals + arcDuration + 50;
     setTimeout(() => {
       cards.forEach((card, index) => {
@@ -231,11 +250,11 @@ function summonCardsFromCircle(cardElements) {
         });
         resolve();
       }, fanDuration + 40);
-    }, stackCompleteAt);
+    }, stackCompleteAt + stackPause);
   });
 }
-// STEP 11: 新しい summon.js が読み込まれたことを画面で確認する。
+// STEP 12: 新しい summon.js が読み込まれたことを画面で確認する。
 (function () {
   const badge = document.getElementById("version-check-badge");
-  if (badge) badge.textContent = "TEST -11 / JS OK";
+  if (badge) badge.textContent = "TEST -12 / JS OK";
 })();
