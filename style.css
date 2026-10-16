@@ -1670,3 +1670,97 @@ body.individual-reveal-active { overflow: hidden; }
     transform: translate(-50%, -50%) scale(.96);
   }
 }
+
+/* =========================
+   STEP 17: SR紫の公転光 ＋ 拡大開封後の黒い外枠を除去
+   現行の「カード後ろで回る光」は残す。
+   同じWebPを縮小して斜めの楕円軌道を移動させ、
+   前後2層を時間で切り替える。画像・抽選処理は変更しない。
+========================= */
+
+/* 開封前の「？」はそのまま。表面を見せたあとの枠だけ消す。 */
+.individual-reveal-card.revealed {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.individual-reveal-card.revealed .gacha-card-image {
+  border-radius: 0;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .20));
+}
+
+/* 前後とカードの重なりを整理する。 */
+.individual-reveal.active.rarity-SR .individual-reveal-sr-orbit { z-index: 0; }
+.individual-reveal.active.rarity-SR .individual-reveal-card { z-index: 2; }
+.individual-reveal.active.rarity-SR .individual-reveal-hint { z-index: 4; }
+
+.individual-reveal-sr-traveler {
+  --sr-travel-x: min(41vw, 184px);
+  --sr-travel-y: min(29vh, 228px);
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 20px);
+  width: clamp(74px, 29vw, 126px);
+  aspect-ratio: 1;
+  display: none;
+  pointer-events: none;
+  background: url("images/effects/sr-purple-orbit.webp") center / contain no-repeat;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  filter: drop-shadow(0 0 10px rgba(186, 120, 255, .42));
+  will-change: transform, opacity;
+}
+.individual-reveal-sr-traveler-back { z-index: 1; }
+.individual-reveal-sr-traveler-front { z-index: 3; }
+
+.individual-reveal.active.rarity-SR .individual-reveal-sr-traveler {
+  display: block;
+  animation: srTravelOrbit 7.2s linear infinite;
+}
+.individual-reveal.active.rarity-SR .individual-reveal-sr-traveler-back {
+  animation: srTravelOrbit 7.2s linear infinite,
+             srTravelBackVisibility 7.2s linear infinite;
+}
+.individual-reveal.active.rarity-SR .individual-reveal-sr-traveler-front {
+  animation: srTravelOrbit 7.2s linear infinite,
+             srTravelFrontVisibility 7.2s linear infinite;
+}
+
+/* 傾いた楕円の周上を8区間でなめらかに移動。
+   横の広がりと縦の広がりは画面サイズに追従する。 */
+@keyframes srTravelOrbit {
+   0%  { transform: translate(calc(-50% - var(--sr-travel-x)), calc(-50% + 5vh)) scale(.56); }
+  12.5%{ transform: translate(calc(-50% - var(--sr-travel-x) * .70), calc(-50% + var(--sr-travel-y) * .74)) scale(.66); }
+  25%  { transform: translate(calc(-50% - 6vw), calc(-50% + var(--sr-travel-y))) scale(.70); }
+  37.5%{ transform: translate(calc(-50% + var(--sr-travel-x) * .72), calc(-50% + var(--sr-travel-y) * .57)) scale(.65); }
+  50%  { transform: translate(calc(-50% + var(--sr-travel-x)), calc(-50% - 5vh)) scale(.56); }
+  62.5%{ transform: translate(calc(-50% + var(--sr-travel-x) * .70), calc(-50% - var(--sr-travel-y) * .74)) scale(.43); }
+  75%  { transform: translate(calc(-50% + 6vw), calc(-50% - var(--sr-travel-y))) scale(.41); }
+  87.5%{ transform: translate(calc(-50% - var(--sr-travel-x) * .72), calc(-50% - var(--sr-travel-y) * .57)) scale(.45); }
+ 100%  { transform: translate(calc(-50% - var(--sr-travel-x)), calc(-50% + 5vh)) scale(.56); }
+}
+
+/* 下側の半周で手前に現れる。文字を隠さないよう光は控えめ。 */
+@keyframes srTravelFrontVisibility {
+  0%, 5% { opacity: 0; }
+  12% { opacity: .34; }
+  27% { opacity: .47; }
+  40% { opacity: .32; }
+  50%, 100% { opacity: 0; }
+}
+/* 上側の半周は背後を回る（カード本体の下に隠れる）。 */
+@keyframes srTravelBackVisibility {
+  0%, 48% { opacity: 0; }
+  57% { opacity: .26; }
+  75% { opacity: .36; }
+  93% { opacity: .23; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .individual-reveal.active.rarity-SR .individual-reveal-sr-traveler {
+    animation: none;
+    display: none;
+  }
+}
