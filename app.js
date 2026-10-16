@@ -1330,9 +1330,10 @@ let individualRevealPreviousFocus = null;
 
 async function showIndividualCardReveal(cardElement) {
   if (individualRevealBusy || isOpeningAll ||
-      !cardElement || cardElement.classList.contains("opened") ||
-      cardElement.classList.contains("opening") ||
+      !cardElement || cardElement.classList.contains("opening") ||
       cardElement.classList.contains("image-preparing")) return;
+
+  const isRevisit = cardElement.classList.contains("opened");
 
   individualRevealBusy = true;
   individualRevealCanClose = false;
@@ -1342,12 +1343,27 @@ async function showIndividualCardReveal(cardElement) {
   individualReveal.setAttribute("aria-hidden", "false");
   individualRevealCard.innerHTML = '<span class="individual-card-question">?</span>';
   individualRevealCard.classList.remove("revealed");
-  individualRevealHint.textContent = "カードを召喚中…";
+  individualRevealCard.style.removeProperty("animation");
+  individualRevealCard.style.removeProperty("transform");
+  individualRevealHint.textContent = isRevisit ? "タップして戻る" : "カードを召喚中…";
   document.body.classList.add("individual-reveal-active");
   individualReveal.focus();
 
-  // 既存の開封処理をそのまま利用することで、NEW・所持数・保存処理を維持する。
-  // 背面での小さなカードの開封アニメーションは暗幕に隠れる。
+  // 開封済みは鑑賞だけ。抽選結果・NEW判定・所持数・アルバムを変更しない。
+  // 再表示時はめくる演出を繰り返さず、すぐに大きく見せる。
+  if (isRevisit) {
+    const existingResult = cardElement.querySelector(".card-result");
+    individualRevealCard.innerHTML = existingResult
+      ? existingResult.innerHTML
+      : "カードを表示できませんでした";
+    individualRevealCard.classList.add("revealed");
+    individualRevealCard.style.animation = "none";
+    individualRevealCard.style.transform = "scale(1)";
+    individualRevealCanClose = true;
+    return;
+  }
+
+  // 未開封カードは今までの開封処理を使用し、NEW・保存仕様を変えない。
   try {
     await openCard(cardElement, true);
     const result = cardElement.querySelector(".card-result");
@@ -1369,6 +1385,8 @@ function closeIndividualCardReveal() {
   if (!individualRevealBusy || !individualRevealCanClose) return;
   individualReveal.className = "individual-reveal";
   individualReveal.setAttribute("aria-hidden", "true");
+  individualRevealCard.style.removeProperty("animation");
+  individualRevealCard.style.removeProperty("transform");
   document.body.classList.remove("individual-reveal-active");
   individualRevealBusy = false;
   individualRevealCanClose = false;
@@ -1473,4 +1491,4 @@ gachaHomeButton.addEventListener(
   }
 );
 // STEP 8の読み込み確認（画像最適化＋先読み）
-(function(){const b=document.getElementById("version-check-badge");if(b)b.textContent="TEST -13 / JS OK";})();
+(function(){const b=document.getElementById("version-check-badge");if(b)b.textContent="TEST -14 / JS OK";})();
