@@ -6,12 +6,12 @@
 
   <title>ファミリーガチャ</title>
 
-  <link rel="stylesheet" href="style.css?v=17" />
+  <link rel="stylesheet" href="style.css?v=18" />
 </head>
 
 <body>
   <!-- 更新確認用: STEP 7。表示位置には影響しません。 -->
-  <div id="version-check-badge" aria-label="テストバージョン" style="position:fixed;top:8px;right:8px;z-index:2147483647;padding:5px 8px;border-radius:6px;background:#172b42;color:#ffffff;border:1px solid #75cfff;font:700 11px/1.4 system-ui,sans-serif;pointer-events:none;box-shadow:0 2px 8px #0008;">TEST -17 / HTML</div>
+  <div id="version-check-badge" aria-label="テストバージョン" style="position:fixed;top:8px;right:8px;z-index:2147483647;padding:5px 8px;border-radius:6px;background:#172b42;color:#ffffff;border:1px solid #75cfff;font:700 11px/1.4 system-ui,sans-serif;pointer-events:none;box-shadow:0 2px 8px #0008;">TEST -18 / HTML</div>
 
   <main class="app">
 
@@ -259,9 +259,15 @@
   <div class="individual-reveal-effect" aria-hidden="true"></div>
   <!-- STEP 16: SRだけに表示する軽量な紫の惑星風エフェクト -->
   <div class="individual-reveal-sr-orbit" aria-hidden="true"></div>
-  <!-- STEP 17: 斜めの楕円軌道を移動する小さなSR紫の光（前後2層） -->
-  <div class="individual-reveal-sr-traveler individual-reveal-sr-traveler-back" aria-hidden="true"></div>
-  <div class="individual-reveal-sr-traveler individual-reveal-sr-traveler-front" aria-hidden="true"></div>
+  <!-- STEP 18: SR専用の交差公転光2つ。各光を前後2層に描き分けてカードを回り込ませる。 -->
+  <div class="individual-reveal-sr-traveler individual-reveal-sr-traveler-back" aria-hidden="true">
+    <div class="sr-orbit-path sr-orbit-path-left"><div class="sr-orbit-rotor"><div class="sr-orbit-spark"></div></div></div>
+    <div class="sr-orbit-path sr-orbit-path-right"><div class="sr-orbit-rotor"><div class="sr-orbit-spark"></div></div></div>
+  </div>
+  <div class="individual-reveal-sr-traveler individual-reveal-sr-traveler-front" aria-hidden="true">
+    <div class="sr-orbit-path sr-orbit-path-left"><div class="sr-orbit-rotor"><div class="sr-orbit-spark"></div></div></div>
+    <div class="sr-orbit-path sr-orbit-path-right"><div class="sr-orbit-rotor"><div class="sr-orbit-spark"></div></div></div>
+  </div>
   <div id="individual-reveal-card" class="individual-reveal-card"><span class="individual-card-question">?</span></div>
   <div id="individual-reveal-hint" class="individual-reveal-hint">カードを召喚中…</div>
 </div>
@@ -275,7 +281,7 @@
 
     <script src="cards.js?v=9"></script>
     <script src="summon.js?v=15"></script>
-    <script src="app.js?v=17"></script>
+    <script src="app.js?v=18"></script>
 
 </body>
 </html>

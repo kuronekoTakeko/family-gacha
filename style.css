@@ -1695,72 +1695,127 @@ body.individual-reveal-active { overflow: hidden; }
 .individual-reveal.active.rarity-SR .individual-reveal-card { z-index: 2; }
 .individual-reveal.active.rarity-SR .individual-reveal-hint { z-index: 4; }
 
+/* =========================
+   STEP 18: SRの2本交差する立体公転光
+   - 左右2つの光が逆方向に連続回転（8点補間を廃止）。
+   - 斜めの楕円面をゆっくり傾け、交差位置を自然に変化させる。
+   - 同一光の前面/背面コピーの回転位相を揃え、透明度だけ交代。
+   - CSS transform + opacity で描画し、他のレアリティに影響させない。
+========================= */
 .individual-reveal-sr-traveler {
-  --sr-travel-x: min(41vw, 184px);
-  --sr-travel-y: min(29vh, 228px);
   position: absolute;
-  left: 50%;
-  top: calc(50% - 20px);
-  width: clamp(74px, 29vw, 126px);
-  aspect-ratio: 1;
+  inset: 0;
   display: none;
   pointer-events: none;
-  background: url("images/effects/sr-purple-orbit.webp") center / contain no-repeat;
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  filter: drop-shadow(0 0 10px rgba(186, 120, 255, .42));
-  will-change: transform, opacity;
 }
 .individual-reveal-sr-traveler-back { z-index: 1; }
 .individual-reveal-sr-traveler-front { z-index: 3; }
-
 .individual-reveal.active.rarity-SR .individual-reveal-sr-traveler {
   display: block;
-  animation: srTravelOrbit 7.2s linear infinite;
-}
-.individual-reveal.active.rarity-SR .individual-reveal-sr-traveler-back {
-  animation: srTravelOrbit 7.2s linear infinite,
-             srTravelBackVisibility 7.2s linear infinite;
-}
-.individual-reveal.active.rarity-SR .individual-reveal-sr-traveler-front {
-  animation: srTravelOrbit 7.2s linear infinite,
-             srTravelFrontVisibility 7.2s linear infinite;
 }
 
-/* 傾いた楕円の周上を8区間でなめらかに移動。
-   横の広がりと縦の広がりは画面サイズに追従する。 */
-@keyframes srTravelOrbit {
-   0%  { transform: translate(calc(-50% - var(--sr-travel-x)), calc(-50% + 5vh)) scale(.56); }
-  12.5%{ transform: translate(calc(-50% - var(--sr-travel-x) * .70), calc(-50% + var(--sr-travel-y) * .74)) scale(.66); }
-  25%  { transform: translate(calc(-50% - 6vw), calc(-50% + var(--sr-travel-y))) scale(.70); }
-  37.5%{ transform: translate(calc(-50% + var(--sr-travel-x) * .72), calc(-50% + var(--sr-travel-y) * .57)) scale(.65); }
-  50%  { transform: translate(calc(-50% + var(--sr-travel-x)), calc(-50% - 5vh)) scale(.56); }
-  62.5%{ transform: translate(calc(-50% + var(--sr-travel-x) * .70), calc(-50% - var(--sr-travel-y) * .74)) scale(.43); }
-  75%  { transform: translate(calc(-50% + 6vw), calc(-50% - var(--sr-travel-y))) scale(.41); }
-  87.5%{ transform: translate(calc(-50% - var(--sr-travel-x) * .72), calc(-50% - var(--sr-travel-y) * .57)) scale(.45); }
- 100%  { transform: translate(calc(-50% - var(--sr-travel-x)), calc(-50% + 5vh)) scale(.56); }
+/* 交差する2つの傾いた軌道。少しだけ中心をずらして単調さを防ぐ。 */
+.sr-orbit-path {
+  position: absolute;
+  width: min(96vw, 420px, 60vh);
+  aspect-ratio: 1 / 1;
+  pointer-events: none;
+  will-change: transform;
+}
+.sr-orbit-path-left {
+  --sr-orbit-duration: 8.6s;
+  --sr-orbit-delay: -0.5s;
+  left: calc(50% - 9px);
+  top: calc(50% - 29px);
+  animation: srOrbitPrecessLeft 24s ease-in-out infinite;
+}
+.sr-orbit-path-right {
+  --sr-orbit-duration: 10.1s;
+  --sr-orbit-delay: -1.2s;
+  left: calc(50% + 13px);
+  top: calc(50% - 13px);
+  animation: srOrbitPrecessRight 29s ease-in-out infinite;
+}
+@keyframes srOrbitPrecessLeft {
+  0%, 100% { transform: translate(-50%, -50%) rotate(-37deg) scaleY(.36); }
+  50%      { transform: translate(-50%, -50%) rotate(-23deg) scaleY(.38); }
+}
+@keyframes srOrbitPrecessRight {
+  0%, 100% { transform: translate(-50%, -50%) rotate(36deg) scaleY(.37); }
+  50%      { transform: translate(-50%, -50%) rotate(22deg) scaleY(.34); }
 }
 
-/* 下側の半周で手前に現れる。文字を隠さないよう光は控えめ。 */
-@keyframes srTravelFrontVisibility {
-  0%, 5% { opacity: 0; }
-  12% { opacity: .34; }
-  27% { opacity: .47; }
-  40% { opacity: .32; }
-  50%, 100% { opacity: 0; }
+/* 丸い回転を楕円面で投影するため、8分割キーフレームの折れ目がない。 */
+.sr-orbit-rotor {
+  position: absolute;
+  inset: 0;
+  transform-origin: center;
+  animation: srOrbitRevolve var(--sr-orbit-duration) linear infinite;
+  animation-delay: var(--sr-orbit-delay);
+  will-change: transform;
 }
-/* 上側の半周は背後を回る（カード本体の下に隠れる）。 */
-@keyframes srTravelBackVisibility {
-  0%, 48% { opacity: 0; }
-  57% { opacity: .26; }
-  75% { opacity: .36; }
-  93% { opacity: .23; }
-  100% { opacity: 0; }
+.sr-orbit-path-right .sr-orbit-rotor { animation-direction: reverse; }
+@keyframes srOrbitRevolve {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
+/* 以前と同じWebP。発光を少し強めるが、手前は小さくしてカード情報を守る。 */
+.sr-orbit-spark {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: clamp(72px, 23vw, 106px);
+  aspect-ratio: 1 / 1;
+  background: url("images/effects/sr-purple-orbit.webp") center / contain no-repeat;
+  transform: translate(-50%, -50%) scaleY(2.75);
+  filter: drop-shadow(0 0 8px rgba(185, 98, 255, .5));
+  opacity: 0;
+  will-change: opacity;
+}
+/* 同じ軌道に重なる手前と奥の光を、半周ごとになめらかに切り替える。 */
+.individual-reveal-sr-traveler-front .sr-orbit-spark {
+  animation: srOrbitCounterSpin var(--sr-orbit-duration) linear infinite,
+             srOrbitFrontLight var(--sr-orbit-duration) linear infinite;
+  animation-delay: var(--sr-orbit-delay), var(--sr-orbit-delay);
+}
+.individual-reveal-sr-traveler-back .sr-orbit-spark {
+  animation: srOrbitCounterSpin var(--sr-orbit-duration) linear infinite,
+             srOrbitBackLight var(--sr-orbit-duration) linear infinite;
+  animation-delay: var(--sr-orbit-delay), var(--sr-orbit-delay);
+}
+/* 左右で手前・奥のタイミングをずらし、両方が長時間消えないようにする。 */
+.individual-reveal-sr-traveler-front .sr-orbit-path-right .sr-orbit-spark {
+  animation-name: srOrbitCounterSpin, srOrbitBackLight;
+}
+.individual-reveal-sr-traveler-back .sr-orbit-path-right .sr-orbit-spark {
+  animation-name: srOrbitCounterSpin, srOrbitFrontLight;
+}
+/* 回る位置だけ楕円に圧縮し、光の絵柄は逆回転・逆拡大で歪みを抑える。 */
+.sr-orbit-path-right .sr-orbit-spark {
+  animation-direction: reverse, normal;
+}
+@keyframes srOrbitCounterSpin {
+  from { transform: translate(-50%, -50%) rotate(0deg) scaleY(2.75); }
+  to   { transform: translate(-50%, -50%) rotate(-360deg) scaleY(2.75); }
+}
+@keyframes srOrbitFrontLight {
+  0%, 100% { opacity: .28; }
+  8%       { opacity: .62; }
+  23%      { opacity: .70; }
+  41%      { opacity: .61; }
+  49%      { opacity: .25; }
+  57%, 94% { opacity: 0; }
+}
+@keyframes srOrbitBackLight {
+  0%, 43%, 100% { opacity: 0; }
+  51%      { opacity: .25; }
+  64%      { opacity: .48; }
+  83%      { opacity: .53; }
+  95%      { opacity: .18; }
+}
 @media (prefers-reduced-motion: reduce) {
   .individual-reveal.active.rarity-SR .individual-reveal-sr-traveler {
-    animation: none;
     display: none;
   }
 }
