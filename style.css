@@ -1696,7 +1696,7 @@ body.individual-reveal-active { overflow: hidden; }
 .individual-reveal.active.rarity-SR .individual-reveal-hint { z-index: 4; }
 
 /* =========================
-   STEP 18: SRの2本交差する立体公転光
+   STEP 18 微調整 / TEST-19: SRの小型・高速・半透明の2本交差公転光
    - 左右2つの光が逆方向に連続回転（8点補間を廃止）。
    - 斜めの楕円面をゆっくり傾け、交差位置を自然に変化させる。
    - 同一光の前面/背面コピーの回転位相を揃え、透明度だけ交代。
@@ -1723,14 +1723,14 @@ body.individual-reveal-active { overflow: hidden; }
   will-change: transform;
 }
 .sr-orbit-path-left {
-  --sr-orbit-duration: 8.6s;
+  --sr-orbit-duration: 4.9s;
   --sr-orbit-delay: -0.5s;
   left: calc(50% - 9px);
   top: calc(50% - 29px);
   animation: srOrbitPrecessLeft 24s ease-in-out infinite;
 }
 .sr-orbit-path-right {
-  --sr-orbit-duration: 10.1s;
+  --sr-orbit-duration: 5.7s;
   --sr-orbit-delay: -1.2s;
   left: calc(50% + 13px);
   top: calc(50% - 13px);
@@ -1760,16 +1760,16 @@ body.individual-reveal-active { overflow: hidden; }
   to   { transform: rotate(360deg); }
 }
 
-/* 以前と同じWebP。発光を少し強めるが、手前は小さくしてカード情報を守る。 */
+/* STEP 18 微調整: 光だけ約半分のサイズに。WebPは変更せず透け感を維持。 */
 .sr-orbit-spark {
   position: absolute;
   left: 50%;
   top: 0;
-  width: clamp(72px, 23vw, 106px);
+  width: clamp(36px, 11.5vw, 53px);
   aspect-ratio: 1 / 1;
   background: url("images/effects/sr-purple-orbit.webp") center / contain no-repeat;
   transform: translate(-50%, -50%) scaleY(2.75);
-  filter: drop-shadow(0 0 8px rgba(185, 98, 255, .5));
+  filter: drop-shadow(0 0 6px rgba(185, 98, 255, .32));
   opacity: 0;
   will-change: opacity;
 }
@@ -1800,19 +1800,19 @@ body.individual-reveal-active { overflow: hidden; }
   to   { transform: translate(-50%, -50%) rotate(-360deg) scaleY(2.75); }
 }
 @keyframes srOrbitFrontLight {
-  0%, 100% { opacity: .28; }
-  8%       { opacity: .62; }
-  23%      { opacity: .70; }
-  41%      { opacity: .61; }
-  49%      { opacity: .25; }
+  0%, 100% { opacity: .19; }
+  8%       { opacity: .40; }
+  23%      { opacity: .52; }
+  41%      { opacity: .42; }
+  49%      { opacity: .18; }
   57%, 94% { opacity: 0; }
 }
 @keyframes srOrbitBackLight {
   0%, 43%, 100% { opacity: 0; }
-  51%      { opacity: .25; }
-  64%      { opacity: .48; }
-  83%      { opacity: .53; }
-  95%      { opacity: .18; }
+  51%      { opacity: .17; }
+  64%      { opacity: .34; }
+  83%      { opacity: .39; }
+  95%      { opacity: .12; }
 }
 @media (prefers-reduced-motion: reduce) {
   .individual-reveal.active.rarity-SR .individual-reveal-sr-traveler {
