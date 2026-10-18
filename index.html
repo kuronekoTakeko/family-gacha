@@ -6,12 +6,12 @@
 
   <title>ファミリーガチャ</title>
 
-  <link rel="stylesheet" href="style.css?v=21" />
+  <link rel="stylesheet" href="style.css?v=22" />
 </head>
 
 <body>
   <!-- 更新確認用: STEP 7。表示位置には影響しません。 -->
-  <div id="version-check-badge" aria-label="テストバージョン" style="position:fixed;top:8px;right:8px;z-index:2147483647;padding:5px 8px;border-radius:6px;background:#172b42;color:#ffffff;border:1px solid #75cfff;font:700 11px/1.4 system-ui,sans-serif;pointer-events:none;box-shadow:0 2px 8px #0008;">TEST -21 / HTML</div>
+  <div id="version-check-badge" aria-label="テストバージョン" style="position:fixed;top:8px;right:8px;z-index:2147483647;padding:5px 8px;border-radius:6px;background:#172b42;color:#ffffff;border:1px solid #75cfff;font:700 11px/1.4 system-ui,sans-serif;pointer-events:none;box-shadow:0 2px 8px #0008;">TEST -22 / HTML</div>
 
   <main class="app">
 
@@ -257,6 +257,8 @@
 <div id="individual-reveal" class="individual-reveal" role="dialog"
      aria-modal="true" aria-label="カード個別開封" aria-hidden="true" tabindex="-1">
   <div class="individual-reveal-effect" aria-hidden="true"></div>
+  <!-- STEP 22: R専用の青い回転エフェクト。カード背後のみ。 -->
+  <div class="individual-reveal-r-aura" aria-hidden="true"></div>
   <!-- STEP 16: SRだけに表示する軽量な紫の惑星風エフェクト -->
   <div class="individual-reveal-sr-orbit" aria-hidden="true"></div>
   <!-- STEP 18: SR専用の交差公転光2つ。各光を前後2層に描き分けてカードを回り込ませる。 -->
@@ -281,7 +283,7 @@
 
     <script src="cards.js?v=9"></script>
     <script src="summon.js?v=15"></script>
-    <script src="app.js?v=21"></script>
+    <script src="app.js?v=22"></script>
 
 </body>
 </html>

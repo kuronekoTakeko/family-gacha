@@ -1825,3 +1825,38 @@ body.individual-reveal-active { overflow: hidden; }
     display: none;
   }
 }
+
+
+/* =========================
+   STEP 22: R専用の青い回転光（カード背後のみ）
+   SRの完成済み演出・共通CSS発光は変更しない。
+========================= */
+.individual-reveal-r-aura {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 20px);
+  width: min(106vw, 445px, 58vh);
+  aspect-ratio: 1 / 1;
+  z-index: 0;
+  display: none;
+  pointer-events: none;
+  background: url("images/effects/r-blue-aura.webp") center / contain no-repeat;
+  opacity: .60;
+  transform: translate(-50%, -50%);
+}
+.individual-reveal.active.rarity-R .individual-reveal-r-aura {
+  display: block;
+  animation: rBlueAuraRotate 12s linear infinite;
+  will-change: transform;
+}
+@keyframes rBlueAuraRotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .individual-reveal.active.rarity-R .individual-reveal-r-aura {
+    animation: none;
+    will-change: auto;
+    transform: translate(-50%, -50%);
+  }
+}
