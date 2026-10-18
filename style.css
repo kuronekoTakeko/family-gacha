@@ -1696,11 +1696,12 @@ body.individual-reveal-active { overflow: hidden; }
 .individual-reveal.active.rarity-SR .individual-reveal-hint { z-index: 4; }
 
 /* =========================
-   STEP 20: SRの交差公転光を再調整
-   - 光はもっと不透明寄りにし、存在感を上げる。
-   - 軌道は円運動感を強め、つぶれすぎを抑える。
-   - 角度は 60° → 45° → 30° → 52° と1周ごとに変化。
-   - 0° / 90° は使わず、もう片方は左右対称で動かす。
+   TEST-21: SR軌道の瞬間ジャンプを解消
+   - 速度・サイズ・光量はTEST-20のまま。
+   - steps(1,end)の段階切替を廃止し、補間される連続傾斜へ。
+   - 一周4.9s/5.7sの間も軌道角度が少しずつ変わり、
+     60° → 45° → 30° → 45° → 60° を滑らかに繰り返す。
+   - もう一方も左右対称。端点で角度と動きが連続。
 ========================= */
 .individual-reveal-sr-traveler {
   position: absolute;
@@ -1727,26 +1728,25 @@ body.individual-reveal-active { overflow: hidden; }
   --sr-orbit-delay: -0.5s;
   left: calc(50% - 8px);
   top: calc(50% - 25px);
-  animation: srOrbitAngleStepLeft calc(4.9s * 4) steps(1, end) infinite;
+  animation: srOrbitPrecessLeftSmooth 19.6s ease-in-out infinite;
 }
 .sr-orbit-path-right {
   --sr-orbit-duration: 5.7s;
   --sr-orbit-delay: -1.2s;
   left: calc(50% + 8px);
   top: calc(50% - 17px);
-  animation: srOrbitAngleStepRight calc(5.7s * 4) steps(1, end) infinite;
+  animation: srOrbitPrecessRightSmooth 22.8s ease-in-out infinite;
 }
-@keyframes srOrbitAngleStepLeft {
-  0%, 24.99%   { transform: translate(-50%, -50%) rotate(-60deg) scaleY(.50); }
-  25%, 49.99%  { transform: translate(-50%, -50%) rotate(-45deg) scaleY(.53); }
-  50%, 74.99%  { transform: translate(-50%, -50%) rotate(-30deg) scaleY(.49); }
-  75%, 100%    { transform: translate(-50%, -50%) rotate(-52deg) scaleY(.52); }
+/* 完全に連続なゆるい歳差運動。
+   角度変更は周回回転とは独立。ループ端でも角度・傾きが一致する。
+   楕円の扁平率も少し変わることで、途切れない螺旋状の流れに見せる。 */
+@keyframes srOrbitPrecessLeftSmooth {
+  0%, 100% { transform: translate(-50%, -50%) rotate(-60deg) scaleY(.51); }
+  50%      { transform: translate(-50%, -50%) rotate(-30deg) scaleY(.57); }
 }
-@keyframes srOrbitAngleStepRight {
-  0%, 24.99%   { transform: translate(-50%, -50%) rotate(60deg) scaleY(.50); }
-  25%, 49.99%  { transform: translate(-50%, -50%) rotate(45deg) scaleY(.53); }
-  50%, 74.99%  { transform: translate(-50%, -50%) rotate(30deg) scaleY(.49); }
-  75%, 100%    { transform: translate(-50%, -50%) rotate(52deg) scaleY(.52); }
+@keyframes srOrbitPrecessRightSmooth {
+  0%, 100% { transform: translate(-50%, -50%) rotate(60deg) scaleY(.51); }
+  50%      { transform: translate(-50%, -50%) rotate(30deg) scaleY(.57); }
 }
 
 /* 円運動を回転で作り、軌道面の傾きだけを別アニメーションで変える。 */

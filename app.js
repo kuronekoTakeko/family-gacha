@@ -1488,4 +1488,4 @@ gachaHomeButton.addEventListener(
   }
 );
 // STEP 8の読み込み確認（画像最適化＋先読み）
-(function(){const b=document.getElementById("version-check-badge");if(b)b.textContent="TEST -20 / JS OK";})();
+(function(){const b=document.getElementById("version-check-badge");if(b)b.textContent="TEST -21 / JS OK";})();
