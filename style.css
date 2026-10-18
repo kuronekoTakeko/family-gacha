@@ -1696,11 +1696,11 @@ body.individual-reveal-active { overflow: hidden; }
 .individual-reveal.active.rarity-SR .individual-reveal-hint { z-index: 4; }
 
 /* =========================
-   STEP 18 微調整 / TEST-19: SRの小型・高速・半透明の2本交差公転光
-   - 左右2つの光が逆方向に連続回転（8点補間を廃止）。
-   - 斜めの楕円面をゆっくり傾け、交差位置を自然に変化させる。
-   - 同一光の前面/背面コピーの回転位相を揃え、透明度だけ交代。
-   - CSS transform + opacity で描画し、他のレアリティに影響させない。
+   STEP 20: SRの交差公転光を再調整
+   - 光はもっと不透明寄りにし、存在感を上げる。
+   - 軌道は円運動感を強め、つぶれすぎを抑える。
+   - 角度は 60° → 45° → 30° → 52° と1周ごとに変化。
+   - 0° / 90° は使わず、もう片方は左右対称で動かす。
 ========================= */
 .individual-reveal-sr-traveler {
   position: absolute;
@@ -1714,10 +1714,10 @@ body.individual-reveal-active { overflow: hidden; }
   display: block;
 }
 
-/* 交差する2つの傾いた軌道。少しだけ中心をずらして単調さを防ぐ。 */
+/* 交差する2つの軌道。中心を少しだけずらして、機械的すぎない見た目にする。 */
 .sr-orbit-path {
   position: absolute;
-  width: min(96vw, 420px, 60vh);
+  width: min(98vw, 430px, 61vh);
   aspect-ratio: 1 / 1;
   pointer-events: none;
   will-change: transform;
@@ -1725,27 +1725,31 @@ body.individual-reveal-active { overflow: hidden; }
 .sr-orbit-path-left {
   --sr-orbit-duration: 4.9s;
   --sr-orbit-delay: -0.5s;
-  left: calc(50% - 9px);
-  top: calc(50% - 29px);
-  animation: srOrbitPrecessLeft 24s ease-in-out infinite;
+  left: calc(50% - 8px);
+  top: calc(50% - 25px);
+  animation: srOrbitAngleStepLeft calc(4.9s * 4) steps(1, end) infinite;
 }
 .sr-orbit-path-right {
   --sr-orbit-duration: 5.7s;
   --sr-orbit-delay: -1.2s;
-  left: calc(50% + 13px);
-  top: calc(50% - 13px);
-  animation: srOrbitPrecessRight 29s ease-in-out infinite;
+  left: calc(50% + 8px);
+  top: calc(50% - 17px);
+  animation: srOrbitAngleStepRight calc(5.7s * 4) steps(1, end) infinite;
 }
-@keyframes srOrbitPrecessLeft {
-  0%, 100% { transform: translate(-50%, -50%) rotate(-37deg) scaleY(.36); }
-  50%      { transform: translate(-50%, -50%) rotate(-23deg) scaleY(.38); }
+@keyframes srOrbitAngleStepLeft {
+  0%, 24.99%   { transform: translate(-50%, -50%) rotate(-60deg) scaleY(.50); }
+  25%, 49.99%  { transform: translate(-50%, -50%) rotate(-45deg) scaleY(.53); }
+  50%, 74.99%  { transform: translate(-50%, -50%) rotate(-30deg) scaleY(.49); }
+  75%, 100%    { transform: translate(-50%, -50%) rotate(-52deg) scaleY(.52); }
 }
-@keyframes srOrbitPrecessRight {
-  0%, 100% { transform: translate(-50%, -50%) rotate(36deg) scaleY(.37); }
-  50%      { transform: translate(-50%, -50%) rotate(22deg) scaleY(.34); }
+@keyframes srOrbitAngleStepRight {
+  0%, 24.99%   { transform: translate(-50%, -50%) rotate(60deg) scaleY(.50); }
+  25%, 49.99%  { transform: translate(-50%, -50%) rotate(45deg) scaleY(.53); }
+  50%, 74.99%  { transform: translate(-50%, -50%) rotate(30deg) scaleY(.49); }
+  75%, 100%    { transform: translate(-50%, -50%) rotate(52deg) scaleY(.52); }
 }
 
-/* 丸い回転を楕円面で投影するため、8分割キーフレームの折れ目がない。 */
+/* 円運動を回転で作り、軌道面の傾きだけを別アニメーションで変える。 */
 .sr-orbit-rotor {
   position: absolute;
   inset: 0;
@@ -1760,20 +1764,20 @@ body.individual-reveal-active { overflow: hidden; }
   to   { transform: rotate(360deg); }
 }
 
-/* STEP 18 微調整: 光だけ約半分のサイズに。WebPは変更せず透け感を維持。 */
+/* 光そのもの。透明になりすぎないようにし、不透明感を強める。 */
 .sr-orbit-spark {
   position: absolute;
   left: 50%;
   top: 0;
-  width: clamp(36px, 11.5vw, 53px);
+  width: clamp(38px, 12vw, 56px);
   aspect-ratio: 1 / 1;
   background: url("images/effects/sr-purple-orbit.webp") center / contain no-repeat;
-  transform: translate(-50%, -50%) scaleY(2.75);
-  filter: drop-shadow(0 0 6px rgba(185, 98, 255, .32));
-  opacity: 0;
+  transform: translate(-50%, -50%) scaleY(2.08);
+  filter: drop-shadow(0 0 7px rgba(185, 98, 255, .38));
+  opacity: .2;
   will-change: opacity;
 }
-/* 同じ軌道に重なる手前と奥の光を、半周ごとになめらかに切り替える。 */
+/* 手前と奥を半周ごとに切り替えるが、完全に消えないようにする。 */
 .individual-reveal-sr-traveler-front .sr-orbit-spark {
   animation: srOrbitCounterSpin var(--sr-orbit-duration) linear infinite,
              srOrbitFrontLight var(--sr-orbit-duration) linear infinite;
@@ -1784,35 +1788,37 @@ body.individual-reveal-active { overflow: hidden; }
              srOrbitBackLight var(--sr-orbit-duration) linear infinite;
   animation-delay: var(--sr-orbit-delay), var(--sr-orbit-delay);
 }
-/* 左右で手前・奥のタイミングをずらし、両方が長時間消えないようにする。 */
 .individual-reveal-sr-traveler-front .sr-orbit-path-right .sr-orbit-spark {
   animation-name: srOrbitCounterSpin, srOrbitBackLight;
 }
 .individual-reveal-sr-traveler-back .sr-orbit-path-right .sr-orbit-spark {
   animation-name: srOrbitCounterSpin, srOrbitFrontLight;
 }
-/* 回る位置だけ楕円に圧縮し、光の絵柄は逆回転・逆拡大で歪みを抑える。 */
 .sr-orbit-path-right .sr-orbit-spark {
   animation-direction: reverse, normal;
 }
 @keyframes srOrbitCounterSpin {
-  from { transform: translate(-50%, -50%) rotate(0deg) scaleY(2.75); }
-  to   { transform: translate(-50%, -50%) rotate(-360deg) scaleY(2.75); }
+  from { transform: translate(-50%, -50%) rotate(0deg) scaleY(2.08); }
+  to   { transform: translate(-50%, -50%) rotate(-360deg) scaleY(2.08); }
 }
 @keyframes srOrbitFrontLight {
-  0%, 100% { opacity: .19; }
-  8%       { opacity: .40; }
-  23%      { opacity: .52; }
-  41%      { opacity: .42; }
-  49%      { opacity: .18; }
-  57%, 94% { opacity: 0; }
+  0%, 100% { opacity: .40; }
+  10%      { opacity: .60; }
+  22%      { opacity: .76; }
+  37%      { opacity: .68; }
+  48%      { opacity: .45; }
+  57%      { opacity: .30; }
+  72%      { opacity: .24; }
+  88%      { opacity: .34; }
 }
 @keyframes srOrbitBackLight {
-  0%, 43%, 100% { opacity: 0; }
-  51%      { opacity: .17; }
-  64%      { opacity: .34; }
-  83%      { opacity: .39; }
-  95%      { opacity: .12; }
+  0%, 12%  { opacity: .24; }
+  24%      { opacity: .30; }
+  38%      { opacity: .44; }
+  50%      { opacity: .54; }
+  66%      { opacity: .46; }
+  82%      { opacity: .30; }
+  100%     { opacity: .24; }
 }
 @media (prefers-reduced-motion: reduce) {
   .individual-reveal.active.rarity-SR .individual-reveal-sr-traveler {
