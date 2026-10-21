@@ -782,19 +782,40 @@ function showScreen(screen) {
 
   screen.classList.add("active");
 
-  // STEP 27: アルバム一覧とアルバム内のカード詳細のみスクロールを許可。
-  // 10連召喚中・開封待ち・開封後は画面全体を固定し、魔法陣の中心が動かないようにする。
-  const allowPageScroll = screen === albumScreen || screen === detailScreen;
-  document.documentElement.classList.toggle("screen-scroll-locked", !allowPageScroll);
-  document.body.classList.toggle("screen-scroll-locked", !allowPageScroll);
+  // STEP 28: 全画面でページ本体を固定する。
+  // アルバム一覧・カード詳細だけは画面内の専用スクロール領域を使い、
+  // iPhone の「下に引っ張って再読み込み」を起こしにくくする。
+  document.documentElement.classList.add("screen-scroll-locked");
+  document.body.classList.add("screen-scroll-locked");
   document.body.classList.toggle("home-viewport", screen === homeScreen);
-
-  window.scrollTo({
-    top: 0,
-    behavior: "instant"
-  });
+  if (screen === albumScreen || screen === detailScreen) {
+    screen.scrollTop = 0;
+  }
 
 }
+
+// STEP 28: アルバム/詳細のスクロール端での引っ張り更新を抑える。
+// スクロール中の通常の指操作は妨げず、最上部で下へ引く/最下部で上へ引く操作だけ止める。
+[albumScreen, detailScreen].forEach(function(scrollArea) {
+  let lastTouchY = null;
+  scrollArea.addEventListener("touchstart", function(event) {
+    lastTouchY = event.touches.length === 1 ? event.touches[0].clientY : null;
+  }, { passive: true });
+  scrollArea.addEventListener("touchmove", function(event) {
+    if (!scrollArea.classList.contains("active") || event.touches.length !== 1) return;
+    const touchY = event.touches[0].clientY;
+    if (lastTouchY === null) { lastTouchY = touchY; return; }
+    const delta = touchY - lastTouchY;
+    lastTouchY = touchY;
+    const atTop = scrollArea.scrollTop <= 0;
+    const atBottom = scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 1;
+    if (event.cancelable && ((delta > 0 && atTop) || (delta < 0 && atBottom))) {
+      event.preventDefault();
+    }
+  }, { passive: false });
+  scrollArea.addEventListener("touchend", function() { lastTouchY = null; }, { passive: true });
+  scrollArea.addEventListener("touchcancel", function() { lastTouchY = null; }, { passive: true });
+});
 
 // =========================
 // レア度を抽選
@@ -1519,4 +1540,4 @@ gachaHomeButton.addEventListener(
   }
 );
 // STEP 8の読み込み確認（画像最適化＋先読み）
-(function(){const b=document.getElementById("version-check-badge");if(b)b.textContent="TEST -27 / JS OK";})();
+(function(){const b=document.getElementById("version-check-badge");if(b)b.textContent="TEST -28 / JS OK";})();
