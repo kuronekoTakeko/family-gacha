@@ -1989,3 +1989,113 @@ body.home-viewport .menu {
   body.home-viewport .preview-question { width: 58px; height: 58px; font-size: 34px; }
   body.home-viewport .preview-card p { margin-top: 10px; font-size: 10px; }
 }
+
+
+/* =========================
+   STEP 27: アルバム一覧/詳細以外のページスクロールを禁止
+   iOS Safari の rubber-band (引っ張り) による召喚位置ずれ対策。
+   個別開封・召喚エフェクト自体の transform / animation は一切変更しない。
+========================= */
+html.screen-scroll-locked {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+body.screen-scroll-locked {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+body.screen-scroll-locked .app {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  padding-top: max(12px, env(safe-area-inset-top));
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+body.screen-scroll-locked .screen.active {
+  height: 100%;
+}
+/* アルバムへの復帰時にはブラウザの通常スクロール動作を利用する。 */
+html:not(.screen-scroll-locked),
+body:not(.screen-scroll-locked) {
+  overscroll-behavior-y: auto;
+}
+
+/* ガチャ・結果画面だけ、表示領域内でレイアウトする。
+   10枚の集結アニメーションとカードの位置計算は変更しない。 */
+body.screen-scroll-locked #gacha-screen.active > .gacha-screen,
+body.screen-scroll-locked #result-screen.active > .gacha-screen {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+body.screen-scroll-locked #gacha-screen .gacha-header,
+body.screen-scroll-locked #result-screen .gacha-header,
+body.screen-scroll-locked #gacha-screen .gacha-message,
+body.screen-scroll-locked #result-screen .gacha-message,
+body.screen-scroll-locked #gacha-screen .card-grid,
+body.screen-scroll-locked #result-screen .result-grid {
+  flex-shrink: 0;
+}
+body.screen-scroll-locked #gacha-screen .gacha-message,
+body.screen-scroll-locked #result-screen .gacha-message {
+  margin-top: clamp(7px, 2dvh, 18px);
+  margin-bottom: clamp(9px, 2.5dvh, 24px);
+}
+body.screen-scroll-locked #gacha-screen .card-grid {
+  padding-bottom: clamp(8px, 2.5dvh, 25px);
+}
+body.screen-scroll-locked #gacha-screen #open-all-area {
+  margin-top: auto;
+}
+body.screen-scroll-locked #gacha-screen #after-gacha-area.show,
+body.screen-scroll-locked #result-screen .result-button-area.show {
+  margin-top: auto;
+  padding-bottom: 0;
+}
+
+/* 縦に短いブラウザでも「もう一度／アルバムへ／ホームへ」を隠さない。 */
+@media (max-height: 640px) {
+  body.screen-scroll-locked .app {
+    padding-top: max(8px, env(safe-area-inset-top));
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+  body.screen-scroll-locked #gacha-screen .gacha-header,
+  body.screen-scroll-locked #result-screen .gacha-header { margin-top: 0; min-height: 38px; }
+  body.screen-scroll-locked #gacha-screen .gacha-header h2,
+  body.screen-scroll-locked #result-screen .gacha-header h2 { font-size: 23px; }
+  body.screen-scroll-locked #gacha-screen .back-button { width: 38px; height: 38px; }
+  body.screen-scroll-locked #gacha-screen .gacha-message,
+  body.screen-scroll-locked #result-screen .gacha-message {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 12px;
+  }
+  body.screen-scroll-locked #gacha-screen .card-grid {
+    width: min(100%, max(180px, calc((100dvh - 310px) * 1.8)));
+    margin: 0 auto;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  body.screen-scroll-locked #gacha-screen #after-gacha-area.show { gap: 7px; }
+  body.screen-scroll-locked #gacha-screen #after-gacha-area .button,
+  body.screen-scroll-locked #gacha-screen #after-gacha-area .result-button,
+  body.screen-scroll-locked #gacha-screen #open-all-area .button,
+  body.screen-scroll-locked #result-screen .button,
+  body.screen-scroll-locked #result-screen .result-button {
+    padding: 9px 14px;
+    font-size: 14px;
+    border-radius: 14px;
+  }
+  body.screen-scroll-locked #gacha-screen #after-gacha-area { margin-top: 8px; }
+  body.screen-scroll-locked #gacha-screen #open-all-area { margin-top: 8px; }
+  body.screen-scroll-locked #result-screen .result-grid { margin-top: 8px; }
+}
