@@ -1895,3 +1895,14 @@ body.individual-reveal-active { overflow: hidden; }
     transform: translate(-50%, -50%);
   }
 }
+
+
+/* =========================
+   STEP 24 (比較テスト): SRの公転光2本を一時的に非表示。
+   背景の紫エフェクト（.individual-reveal-sr-orbit）の回転は維持する。
+   復元する場合は、このルールを削除するだけで元の公転を再表示できる。
+   SSR・R・UR・Nには影響を与えない。
+========================= */
+.individual-reveal.active.rarity-SR .individual-reveal-sr-traveler {
+  display: none;
+}
