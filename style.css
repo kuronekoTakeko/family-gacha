@@ -1648,6 +1648,7 @@ body.individual-reveal-active { overflow: hidden; }
   z-index: 0; /* 個別開封カード(z-index:1)より後ろ */
   pointer-events: none;
   background: url("images/effects/sr-purple-orbit.webp") center / contain no-repeat;
+  filter: drop-shadow(0 0 13px rgba(172, 71, 255, .33));
   display: none;
   opacity: 0;
   transform: translate(-50%, -50%);
@@ -1657,16 +1658,16 @@ body.individual-reveal-active { overflow: hidden; }
   animation: srPlanetOrbit 9s linear infinite;
 }
 @keyframes srPlanetOrbit {
-  0%   { opacity: .44; transform: translate(-50%, -50%) rotate(0deg) scale(.96); }
-  28%  { opacity: .62; }
-  55%  { opacity: .55; }
-  78%  { opacity: .63; }
-  100% { opacity: .44; transform: translate(-50%, -50%) rotate(360deg) scale(.96); }
+  0%   { opacity: .70; transform: translate(-50%, -50%) rotate(0deg) scale(.96); }
+  28%  { opacity: .82; }
+  55%  { opacity: .76; }
+  78%  { opacity: .83; }
+  100% { opacity: .70; transform: translate(-50%, -50%) rotate(360deg) scale(.96); }
 }
 @media (prefers-reduced-motion: reduce) {
   .individual-reveal.active.rarity-SR .individual-reveal-sr-orbit {
     animation: none;
-    opacity: .48;
+    opacity: .75;
     transform: translate(-50%, -50%) scale(.96);
   }
 }
@@ -1835,7 +1836,7 @@ body.individual-reveal-active { overflow: hidden; }
   position: absolute;
   left: 50%;
   top: calc(50% - 20px);
-  width: min(106vw, 445px, 58vh);
+  width: min(92vw, 390px, 52vh);
   aspect-ratio: 1 / 1;
   z-index: 0;
   display: none;
@@ -1870,7 +1871,7 @@ body.individual-reveal-active { overflow: hidden; }
   position: absolute;
   left: 50%;
   top: calc(50% - 20px);
-  width: min(122vw, 550px, 70vh);
+  width: min(113vw, 510px, 65vh);
   aspect-ratio: 1 / 1;
   z-index: 0;
   display: none;
@@ -1906,3 +1907,11 @@ body.individual-reveal-active { overflow: hidden; }
 .individual-reveal.active.rarity-SR .individual-reveal-sr-traveler {
   display: none;
 }
+
+/* =========================
+   STEP 25: 個別開封の光量バランス調整
+   Rを少し小さく、SRの紫を明瞭にする。
+   SR公転光2本はTEST-24のまま非表示。
+   SSRの金色は光量を保ったまま約7％小さくする。
+   その他の演出は変更しない。
+========================= */
