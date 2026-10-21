@@ -1860,3 +1860,38 @@ body.individual-reveal-active { overflow: hidden; }
     transform: translate(-50%, -50%);
   }
 }
+
+/* =========================
+   STEP 23: SSR専用の金色回転光（カード背後のみ）
+   既存R・SR・URの演出や共通CSS発光は変更しない。
+   強い光はカード背後に置き、カードの文字・絵を隠さない。
+========================= */
+.individual-reveal-ssr-aura {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 20px);
+  width: min(122vw, 550px, 70vh);
+  aspect-ratio: 1 / 1;
+  z-index: 0;
+  display: none;
+  pointer-events: none;
+  background: url("images/effects/ssr-golden-aura.webp") center / contain no-repeat;
+  opacity: .82;
+  transform: translate(-50%, -50%);
+}
+.individual-reveal.active.rarity-SSR .individual-reveal-ssr-aura {
+  display: block;
+  animation: ssrGoldenAuraRotate 10s linear infinite;
+  will-change: transform;
+}
+@keyframes ssrGoldenAuraRotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .individual-reveal.active.rarity-SSR .individual-reveal-ssr-aura {
+    animation: none;
+    will-change: auto;
+    transform: translate(-50%, -50%);
+  }
+}
