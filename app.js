@@ -98,6 +98,27 @@ function prepareCardImage(cardData) {
 }
 
 
+// STEP 26: 召喚演出が始まった時点で、個別開封用の背景光を先読みする。
+// 元画像のCSS背景は変更せず、初回開封時の読み込み・デコード待ちを減らす。
+// 保存・抽選処理には触れず、失敗しても開封を止めない。
+const revealAuraPreloads = new Map();
+function prepareRevealAuraImages() {
+  [
+    "images/effects/r-blue-aura.webp",
+    "images/effects/sr-purple-orbit.webp",
+    "images/effects/ssr-golden-aura.webp"
+  ].forEach(function(src) {
+    if (revealAuraPreloads.has(src)) return;
+    const image = new Image();
+    image.decoding = "async";
+    revealAuraPreloads.set(src, image);
+    image.src = src;
+    if (typeof image.decode === "function") {
+      image.decode().catch(function() {});
+    }
+  });
+}
+
 const rarityOrder = {
   UR: 5,
   SSR: 4,
@@ -761,6 +782,9 @@ function showScreen(screen) {
 
   screen.classList.add("active");
 
+  // ホームだけを画面高ぴったりにし、アルバム等のスクロールは維持する。
+  document.body.classList.toggle("home-viewport", screen === homeScreen);
+
   window.scrollTo({
     top: 0,
     behavior: "instant"
@@ -953,6 +977,9 @@ afterGachaArea.classList.remove("show");
 // =========================
 
 function startTenGacha() {
+
+  // 開封の数秒前からR・SR・SSRの光を先読み（召喚タイミングは変更しない）。
+  prepareRevealAuraImages();
 
   // 10連結果を抽選
   currentGachaResults =
@@ -1488,4 +1515,4 @@ gachaHomeButton.addEventListener(
   }
 );
 // STEP 8の読み込み確認（画像最適化＋先読み）
-(function(){const b=document.getElementById("version-check-badge");if(b)b.textContent="TEST -25 / JS OK";})();
+(function(){const b=document.getElementById("version-check-badge");if(b)b.textContent="TEST -26 / JS OK";})();
