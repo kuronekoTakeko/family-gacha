@@ -7,11 +7,12 @@
   <title>ファミリーガチャ</title>
 
   <link rel="stylesheet" href="style.css?v=28" />
+  <link rel="stylesheet" href="ur-reveal.css?v=28G" />
 </head>
 
 <body class="home-viewport screen-scroll-locked">
   <!-- 更新確認用: STEP 7。表示位置には影響しません。 -->
-  <div id="version-check-badge" aria-label="テストバージョン" style="position:fixed;top:8px;right:8px;z-index:2147483647;padding:5px 8px;border-radius:6px;background:#172b42;color:#ffffff;border:1px solid #75cfff;font:700 11px/1.4 system-ui,sans-serif;pointer-events:none;box-shadow:0 2px 8px #0008;">TEST -28E17 / HTML</div>
+  <div id="version-check-badge" aria-label="テストバージョン" style="position:fixed;top:8px;right:8px;z-index:2147483647;padding:5px 8px;border-radius:6px;background:#172b42;color:#ffffff;border:1px solid #75cfff;font:700 11px/1.4 system-ui,sans-serif;pointer-events:none;box-shadow:0 2px 8px #0008;">TEST -28F / HTML</div>
 
   <main class="app">
 
@@ -261,6 +262,8 @@
   <div class="individual-reveal-r-aura" aria-hidden="true"></div>
   <!-- STEP 23: SSR専用の金色回転エフェクト。オードの背後のみ。 -->
   <div class="individual-reveal-ssr-aura" aria-hidden="true"></div>
+  <!-- TEST-28G: UR専用虹エフェクト（個別開封カードの背後のみ） -->
+  <div class="individual-reveal-ur-aura" aria-hidden="true"></div>
   <!-- STEP 16: SRだけに表示する軽量な紫の惑星風エフェクト -->
   <div class="individual-reveal-sr-orbit" aria-hidden="true"></div>
   <!-- STEP 18: SR専用の交差公転光2つ。各光を前後2層に描き分けてオードを回り込ませる。 -->
@@ -283,7 +286,7 @@
 
 </div>
 
-    <script src="cards.js?v=28E17"></script>
+    <script src="cards.js?v=28G"></script>
     <script src="summon.js?v=15"></script>
     <script src="app.js?v=28"></script>
     <!-- TEST-28E17: カード014〜017の表示名だけ、既存アルバム保存記録と同期 -->
@@ -316,6 +319,8 @@
         }
       })();
     </script>
+    <!-- TEST-28F: 排出確率を調整／10連SR以上保証を撤廃 -->
+    <script src="gacha-balance.js?v=28G"></script>
 
 </body>
 </html>

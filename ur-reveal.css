@@ -1,0 +1,32 @@
+/* TEST-28G: URの個別開封用の虹色光だけを追加。
+   R/SR/SSRの既存エフェクト、カード配置、召喚の挙動は変更しない。 */
+.individual-reveal-ur-aura {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 20px);
+  width: min(120vw, 550px, 68vh);
+  aspect-ratio: 1 / 1;
+  display: none;
+  pointer-events: none;
+  z-index: 0;
+  background: url("images/effects/ur-rainbow-aura.webp") center / contain no-repeat;
+  opacity: .83;
+  transform: translate(-50%, -50%);
+}
+.individual-reveal.active.rarity-UR .individual-reveal-ur-aura {
+  display: block;
+  animation: urRainbowAuraRotate 9s linear infinite;
+  will-change: transform;
+}
+@keyframes urRainbowAuraRotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+/* 既存URのぼかした虹色背景も残すが、イラストを目立たせるため少し控えめにする */
+.individual-reveal.active.rarity-UR .individual-reveal-effect { opacity: .24; }
+@media (prefers-reduced-motion: reduce) {
+  .individual-reveal.active.rarity-UR .individual-reveal-ur-aura {
+    animation: none;
+    will-change: auto;
+  }
+}

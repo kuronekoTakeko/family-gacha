@@ -104,14 +104,14 @@ const cardPool = [
   {
     id: "card015",
     number: 15,
-    name: "一触即発　チソカとチロロ",
+    name: "チソカとチロロ",
     rarity: "SSR",
     image: "images/cards/card015.webp"
   },
   {
     id: "card016",
     number: 16,
-    name: "かーめーはーめーへー",
+    name: "おーやーじーのーへー",
     rarity: "SSR",
     image: "images/cards/card016.webp"
   },
