@@ -8,12 +8,12 @@
 
   <link rel="stylesheet" href="style.css?v=28" />
   <link rel="stylesheet" href="ur-reveal.css?v=28G" />
-  <link rel="stylesheet" href="magic-circle-upgrade.css?v=29B" />
+  <link rel="stylesheet" href="magic-circle-upgrade.css?v=29D2" />
 </head>
 
 <body class="home-viewport screen-scroll-locked">
   <!-- 更新確認用: STEP 7。表示位置には影響しません。 -->
-  <div id="version-check-badge" aria-label="テストバージョン" style="position:fixed;top:8px;right:8px;z-index:2147483647;padding:5px 8px;border-radius:6px;background:#172b42;color:#ffffff;border:1px solid #75cfff;font:700 11px/1.4 system-ui,sans-serif;pointer-events:none;box-shadow:0 2px 8px #0008;">TEST -29B / HTML</div>
+  <div id="version-check-badge" aria-label="テストバージョン" style="position:fixed;top:8px;right:8px;z-index:2147483647;padding:5px 8px;border-radius:6px;background:#172b42;color:#ffffff;border:1px solid #75cfff;font:700 11px/1.4 system-ui,sans-serif;pointer-events:none;box-shadow:0 2px 8px #0008;">TEST -29D2 / HTML</div>
 
   <main class="app">
 
@@ -281,6 +281,14 @@
 </div>
     <div id="summon-overlay" class="summon-overlay">
 
+  <div id="god-ten-guardian" class="god-ten-guardian" aria-hidden="true">
+    <div class="god-ten-guardian__bg god-ten-guardian__bg--white"></div>
+    <div class="god-ten-guardian__bg god-ten-guardian__bg--rainbow"></div>
+    <img class="god-ten-guardian__shadow" src="images/summon/guardian-god-male.webp" alt="" decoding="async" />
+    <img class="god-ten-guardian__figure" src="images/summon/guardian-god-male.webp" alt="" decoding="async" />
+    <div class="god-ten-guardian__title" aria-hidden="true">守護神降臨</div>
+  </div>
+
   <div id="magic-circle" class="magic-circle">
     <div class="magic-circle-rotor" aria-hidden="true">
       <img class="magic-circle-layer layer-blue" src="images/summon/magic-circle-blue.png" alt="" decoding="async" />
@@ -326,15 +334,14 @@
       })();
     </script>
     <!-- TEST-28F: 排出確率を調整／10連SR以上保証を撤廃 -->
-    <script src="gacha-balance.js?v=29B"></script>
-    <script src="magic-circle-upgrade.js?v=29B"></script>
-    <script src="summon-center-size.js?v=29C"></script>
+    <script src="gacha-balance.js?v=29D2"></script>
+    <script src="magic-circle-upgrade.js?v=29D2"></script>
+    <script src="summon-center-size.js?v=29D2"></script>
     <script>
-      // TEST-29C: 中央召喚カード位置補正の読み込み確認
       (function () {
         const badge = document.getElementById("version-check-badge");
         if (badge && Element.prototype.__family29BSizePatch) {
-          badge.textContent = "TEST -29C / JS OK";
+          badge.textContent = "TEST -29D2 / JS OK";
         }
       })();
     </script>

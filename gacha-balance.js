@@ -1,5 +1,5 @@
-/* TEST-29A: 10連排出バランス調整＋神10連1%＋召喚魔法陣昇格プラン作成
-   app.js自体は変更せず、抽選結果と演出用メタ情報だけを上書きする。 */
+/* TEST-29D2: 神10連1%＋守護神降臨＋特殊スタート確率調整
+   app.js本体は触らず、抽選結果と演出メタ情報だけを上書きする。 */
 (function () {
   "use strict";
 
@@ -7,12 +7,17 @@
   const GOD_TEN_CHANCE = 0.01; // 1%
   const SUMMON_INTERVAL_MS = 650;
   const rarityOrder = { N: 0, R: 1, SR: 2, SSR: 3, UR: 4 };
+  const colorOrder = ["blue", "purple", "gold", "rainbow"];
 
   rarityRates.forEach(function (entry) {
     if (Object.prototype.hasOwnProperty.call(newRates, entry.rarity)) {
       entry.rate = newRates[entry.rarity];
     }
   });
+
+  function colorLevel(color) {
+    return Math.max(0, colorOrder.indexOf(color));
+  }
 
   function rollPercentTable(table) {
     const roll = Math.random() * 100;
@@ -56,6 +61,24 @@
     return "blue";
   }
 
+  // 10連全体で紫約5% / 金約1% / 虹約0.1%。
+  // まず元の最終色を決め、その範囲内で開始色を抽選する。
+  // 神10連1%を含む理論上の最終色分布から条件付き確率を計算。
+  // 最終色（および元の昇格抽選確率）には手を加えない。
+  const START_CHANCE = {
+    purple: 0.319841694265,
+    gold: 0.386630948963,
+    rainbow: 0.381580342660
+  };
+
+  function chooseSpecialStart(finalColor) {
+    const maxLevel = colorLevel(finalColor);
+    if (maxLevel >= 3 && Math.random() < START_CHANCE.rainbow) return "rainbow";
+    if (maxLevel >= 2 && Math.random() < START_CHANCE.gold) return "gold";
+    if (maxLevel >= 1 && Math.random() < START_CHANCE.purple) return "purple";
+    return "blue";
+  }
+
   function chooseUpgradePath(finalColor) {
     if (finalColor === "blue") return [];
     if (finalColor === "purple") return ["purple"];
@@ -74,7 +97,6 @@
   function chooseTiming(pathLength) {
     if (pathLength <= 0) return { type: "none", cardIndices: [] };
     if (Math.random() < 0.30) return { type: "pre", cardIndices: [] };
-
     if (pathLength === 1) {
       const patterns = [[2], [3], [5], [7]];
       return { type: "mid", cardIndices: patterns[Math.floor(Math.random() * patterns.length)] };
@@ -90,35 +112,24 @@
   function buildCirclePlan(results, isGodTen) {
     const highestRarity = getHighestRarity(results);
     const finalColor = chooseFinalCircle(highestRarity);
-    // 特別な初期色。15%は暫定値（最終色の確率はそのまま）。
-    // ここでは最終色までしか選ばないため、期待外れの色は絶対に出ない。
-    const colorLevel = { blue: 0, purple: 1, gold: 2, rainbow: 3 };
-    const startCandidates = ["purple", "gold", "rainbow"].filter(function(color) {
-      return colorLevel[color] <= colorLevel[finalColor];
-    });
-    const startColor = startCandidates.length && Math.random() < 0.15
-      ? startCandidates[Math.floor(Math.random() * startCandidates.length)]
-      : "blue";
+    const startColor = chooseSpecialStart(finalColor);
 
-    // 途中昇格は通常／飛び級を混ぜる（元の選択率を保持）。
-    const roughPath = chooseUpgradePath(finalColor).filter(function(color) {
-      return colorLevel[color] > colorLevel[startColor];
+    const roughPath = chooseUpgradePath(finalColor).filter(function (color) {
+      return colorLevel(color) > colorLevel(startColor);
     });
-    // 最終色まで必ず到達させる。
-    const pathColors = roughPath.length || startColor === finalColor
-      ? roughPath : [finalColor];
+    const pathColors = roughPath.length || startColor === finalColor ? roughPath : [finalColor];
     const timing = chooseTiming(pathColors.length);
-    // 召喚前は90度ごとの段階演出を優先し、飛び級しない。
-    const sequentialColors = ["purple", "gold", "rainbow"].filter(function(color) {
-      return colorLevel[color] > colorLevel[startColor] &&
-             colorLevel[color] <= colorLevel[finalColor];
+    const sequentialColors = ["purple", "gold", "rainbow"].filter(function (color) {
+      return colorLevel(color) > colorLevel(startColor) &&
+             colorLevel(color) <= colorLevel(finalColor);
     });
     const actualPath = timing.type === "pre" ? sequentialColors : pathColors;
+
     return {
       isGodTen: isGodTen,
       highestRarity: highestRarity,
-      finalColor: finalColor,
       startColor: startColor,
+      finalColor: finalColor,
       pathColors: actualPath,
       timingType: timing.type,
       stepCardIndices: timing.cardIndices,
@@ -130,16 +141,21 @@
   function drawGodTenCards() {
     const results = [];
     let guard = 0;
-    while (results.length < 10 && guard < 5000) {
+    while (results.length < 10 && guard < 7000) {
       const card = drawOneCard();
       if (rarityOrder[card.rarity] >= rarityOrder.SR) {
         results.push(card);
       }
       guard += 1;
     }
+    // 例外的な抽選回数超過時でも、神10連のSR以上保証は必ず守る。
     if (results.length < 10) {
-      // 念のための保険。通常抽選で埋めるが、この分岐には通常入りません。
-      while (results.length < 10) results.push(drawOneCard());
+      const rareCards = cardPool.filter(function (card) {
+        return rarityOrder[card.rarity] >= rarityOrder.SR;
+      });
+      while (results.length < 10 && rareCards.length) {
+        results.push(rareCards[Math.floor(Math.random() * rareCards.length)]);
+      }
     }
     return results;
   }
@@ -153,7 +169,7 @@
     })();
 
     const meta = {
-      version: "29B",
+      version: "29D2",
       isGodTen: isGodTen,
       godTenChance: GOD_TEN_CHANCE,
       circlePlan: buildCirclePlan(results, isGodTen)
@@ -165,5 +181,5 @@
   };
 
   const badge = document.getElementById("version-check-badge");
-  if (badge) badge.textContent = "TEST -29B / JS OK";
+  if (badge) badge.textContent = "TEST -29D2 / JS OK";
 })();

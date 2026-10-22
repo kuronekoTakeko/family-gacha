@@ -1,10 +1,14 @@
-/* TEST-29B: 4枚を完全な同心円として先読み・同時回転。画像差し替えはしない。 */
+/* TEST-29D2: 4枚同心円＋神10連専用「守護神降臨」演出 */
+#summon-overlay {
+  isolation: isolate;
+  overflow: hidden;
+}
 #magic-circle {
-  /* 旧29Aの親要素scale/filter効果は使わない。位置補正は元のCSSに任せる */
   scale: 1;
   filter: drop-shadow(0 0 12px rgba(58, 163, 255, 0.48));
-  transition: opacity .35s ease, transform .45s ease;
+  transition: opacity .35s ease, transform .45s ease, filter .35s ease;
   will-change: opacity, transform;
+  z-index: 20;
 }
 #magic-circle .magic-circle-rotor {
   position: absolute;
@@ -15,6 +19,9 @@
 }
 #magic-circle.show .magic-circle-rotor {
   animation: summonBlueRotate 8s linear infinite;
+}
+#magic-circle.family-paused .magic-circle-rotor {
+  animation-play-state: paused;
 }
 #magic-circle .magic-circle-layer {
   display: block;
@@ -29,7 +36,7 @@
   visibility: hidden;
   pointer-events: none;
   transition: opacity 360ms ease, filter 260ms ease;
-  animation: none;  /* 回転は共通親のみ */
+  animation: none;
   will-change: opacity;
 }
 #magic-circle .layer-blue    { z-index: 1; transform: scale(1);    opacity: 1; visibility: visible; }
@@ -43,15 +50,113 @@
 #magic-circle .magic-circle-layer.family-reveal {
   filter: brightness(1.38) saturate(1.15) drop-shadow(0 0 13px rgba(255,255,255,.7));
 }
-/* レア度が上がるほど後ろの層は控えめにして、上位色を明確にする */
 #magic-circle[data-family-color="purple"] .layer-blue { opacity: .32; }
 #magic-circle[data-family-color="gold"] .layer-blue { opacity: .20; }
 #magic-circle[data-family-color="gold"] .layer-purple { opacity: .35; }
 #magic-circle[data-family-color="rainbow"] .layer-blue,
 #magic-circle[data-family-color="rainbow"] .layer-purple,
 #magic-circle[data-family-color="rainbow"] .layer-gold { opacity: .23; }
+
+#god-ten-guardian {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  overflow: hidden;
+}
+#god-ten-guardian .god-ten-guardian__bg,
+#god-ten-guardian .god-ten-guardian__shadow,
+#god-ten-guardian .god-ten-guardian__figure,
+#god-ten-guardian .god-ten-guardian__title {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity .55s ease, transform .75s ease, filter .55s ease;
+}
+#god-ten-guardian .god-ten-guardian__bg {
+  inset: 0;
+  left: auto;
+  top: auto;
+  transform: none;
+}
+#god-ten-guardian .god-ten-guardian__bg--white {
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,.96) 0%, rgba(255,255,255,.72) 18%, rgba(255,255,255,.15) 42%, rgba(255,255,255,0) 70%);
+}
+#god-ten-guardian .god-ten-guardian__bg--rainbow {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 42%),
+    conic-gradient(from 0deg, rgba(255,120,120,.30), rgba(255,190,85,.34), rgba(255,250,140,.34), rgba(160,255,180,.30), rgba(140,220,255,.30), rgba(170,140,255,.34), rgba(255,150,230,.32), rgba(255,120,120,.30));
+  filter: saturate(1.15) blur(10px);
+}
+#god-ten-guardian .god-ten-guardian__shadow,
+#god-ten-guardian .god-ten-guardian__figure {
+  top: 39%;
+  width: min(120vw, 640px);
+  max-width: none;
+  height: auto;
+  transform-origin: 50% 50%;
+}
+#god-ten-guardian .god-ten-guardian__shadow {
+  filter: brightness(0) blur(2px);
+  transform: translate(-50%, -50%) scale(.90);
+}
+#god-ten-guardian .god-ten-guardian__figure {
+  filter: drop-shadow(0 0 18px rgba(255,255,255,.35)) drop-shadow(0 0 36px rgba(255,224,146,.28));
+  transform: translate(-50%, -50%) scale(.88);
+}
+#god-ten-guardian .god-ten-guardian__title {
+  top: calc(50% + min(52vw, 260px));
+  padding: .42rem .95rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255,255,255,.85), rgba(255,243,205,.88), rgba(255,255,255,.85));
+  color: #5a3400;
+  font: 900 18px/1.1 system-ui, sans-serif;
+  letter-spacing: .18em;
+  text-shadow: 0 1px 0 rgba(255,255,255,.7);
+  box-shadow: 0 8px 24px rgba(0,0,0,.20);
+  white-space: nowrap;
+}
+#summon-overlay.family-god-shadow #god-ten-guardian .god-ten-guardian__shadow {
+  opacity: .42;
+  transform: translate(-50%, -50%) scale(.97);
+}
+#summon-overlay.family-god-white #god-ten-guardian .god-ten-guardian__bg--white {
+  opacity: .98;
+}
+#summon-overlay.family-god-rainbow #god-ten-guardian .god-ten-guardian__bg--rainbow {
+  opacity: .82;
+}
+#summon-overlay.family-god-reveal #god-ten-guardian .god-ten-guardian__shadow {
+  opacity: .12;
+  transform: translate(-50%, -50%) scale(1.02);
+}
+#summon-overlay.family-god-reveal #god-ten-guardian .god-ten-guardian__figure {
+  opacity: .93;
+  transform: translate(-50%, -50%) scale(1);
+}
+#summon-overlay.family-god-reveal #god-ten-guardian .god-ten-guardian__title {
+  opacity: .96;
+  transform: translate(-50%, -50%) scale(1);
+}
+#summon-overlay.family-god-exit #god-ten-guardian .god-ten-guardian__bg--white,
+#summon-overlay.family-god-exit #god-ten-guardian .god-ten-guardian__bg--rainbow,
+#summon-overlay.family-god-exit #god-ten-guardian .god-ten-guardian__shadow,
+#summon-overlay.family-god-exit #god-ten-guardian .god-ten-guardian__figure,
+#summon-overlay.family-god-exit #god-ten-guardian .god-ten-guardian__title {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(1.03);
+}
 @media (prefers-reduced-motion: reduce) {
   #magic-circle .magic-circle-rotor,
   #magic-circle.show .magic-circle-rotor { animation: none; will-change: auto; }
-  #magic-circle .magic-circle-layer { transition: none; will-change: auto; }
+  #magic-circle .magic-circle-layer,
+  #god-ten-guardian .god-ten-guardian__bg,
+  #god-ten-guardian .god-ten-guardian__shadow,
+  #god-ten-guardian .god-ten-guardian__figure,
+  #god-ten-guardian .god-ten-guardian__title {
+    transition: none;
+    will-change: auto;
+  }
 }
