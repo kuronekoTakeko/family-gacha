@@ -8,12 +8,12 @@
 
   <link rel="stylesheet" href="style.css?v=28" />
   <link rel="stylesheet" href="ur-reveal.css?v=28G" />
-  <link rel="stylesheet" href="magic-circle-upgrade.css?v=29A" />
+  <link rel="stylesheet" href="magic-circle-upgrade.css?v=29B" />
 </head>
 
 <body class="home-viewport screen-scroll-locked">
   <!-- 更新確認用: STEP 7。表示位置には影響しません。 -->
-  <div id="version-check-badge" aria-label="テストバージョン" style="position:fixed;top:8px;right:8px;z-index:2147483647;padding:5px 8px;border-radius:6px;background:#172b42;color:#ffffff;border:1px solid #75cfff;font:700 11px/1.4 system-ui,sans-serif;pointer-events:none;box-shadow:0 2px 8px #0008;">TEST -28F / HTML</div>
+  <div id="version-check-badge" aria-label="テストバージョン" style="position:fixed;top:8px;right:8px;z-index:2147483647;padding:5px 8px;border-radius:6px;background:#172b42;color:#ffffff;border:1px solid #75cfff;font:700 11px/1.4 system-ui,sans-serif;pointer-events:none;box-shadow:0 2px 8px #0008;">TEST -29B / HTML</div>
 
   <main class="app">
 
@@ -282,7 +282,12 @@
     <div id="summon-overlay" class="summon-overlay">
 
   <div id="magic-circle" class="magic-circle">
-    <img class="magic-circle-image" src="images/summon/magic-circle-blue.png" alt="" aria-hidden="true" />
+    <div class="magic-circle-rotor" aria-hidden="true">
+      <img class="magic-circle-layer layer-blue" src="images/summon/magic-circle-blue.png" alt="" decoding="async" />
+      <img class="magic-circle-layer layer-purple" src="images/summon/magic-circle-purple.png" alt="" decoding="async" />
+      <img class="magic-circle-layer layer-gold" src="images/summon/magic-circle-gold.png" alt="" decoding="async" />
+      <img class="magic-circle-layer layer-rainbow" src="images/summon/magic-circle-rainbow.png" alt="" decoding="async" />
+    </div>
   </div>
 
 </div>
@@ -321,8 +326,9 @@
       })();
     </script>
     <!-- TEST-28F: 排出確率を調整／10連SR以上保証を撤廃 -->
-    <script src="gacha-balance.js?v=29A"></script>
-    <script src="magic-circle-upgrade.js?v=29A"></script>
+    <script src="gacha-balance.js?v=29B"></script>
+    <script src="magic-circle-upgrade.js?v=29B"></script>
+    <script src="summon-center-size.js?v=29B"></script>
 
 </body>
 </html>

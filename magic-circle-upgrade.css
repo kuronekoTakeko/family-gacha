@@ -1,30 +1,57 @@
-/* TEST-29A: 召喚魔法陣の昇格演出用の追加CSS
-   既存の召喚アニメーションやカードの移動には触れない。 */
+/* TEST-29B: 4枚を完全な同心円として先読み・同時回転。画像差し替えはしない。 */
 #magic-circle {
-  --family-circle-scale: 1;
-  --family-circle-glow: rgba(120, 210, 255, 0.55);
-  scale: var(--family-circle-scale);
-  transition: scale 360ms ease, filter 240ms ease, opacity 240ms ease;
-  will-change: scale, filter, opacity;
+  /* 旧29Aの親要素scale/filter効果は使わない。位置補正は元のCSSに任せる */
+  scale: 1;
+  filter: drop-shadow(0 0 12px rgba(58, 163, 255, 0.48));
+  transition: opacity .35s ease, transform .45s ease;
+  will-change: opacity, transform;
 }
-#magic-circle .magic-circle-image {
-  transition: filter 220ms ease, opacity 220ms ease;
-  will-change: filter, opacity;
+#magic-circle .magic-circle-rotor {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  animation: none;
+  will-change: transform;
 }
-#magic-circle[data-family-color="blue"]    { --family-circle-glow: rgba(120, 210, 255, 0.55); }
-#magic-circle[data-family-color="purple"]  { --family-circle-glow: rgba(174, 120, 255, 0.62); }
-#magic-circle[data-family-color="gold"]    { --family-circle-glow: rgba(255, 212, 92, 0.70); }
-#magic-circle[data-family-color="rainbow"] { --family-circle-glow: rgba(255, 255, 255, 0.85); }
-#magic-circle.family-circle-impact {
-  filter: drop-shadow(0 0 16px var(--family-circle-glow)) drop-shadow(0 0 34px var(--family-circle-glow));
+#magic-circle.show .magic-circle-rotor {
+  animation: summonBlueRotate 8s linear infinite;
 }
-#magic-circle.family-circle-impact .magic-circle-image {
-  filter: brightness(1.25) saturate(1.15);
+#magic-circle .magic-circle-layer {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform-origin: 50% 50%;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 360ms ease, filter 260ms ease;
+  animation: none;  /* 回転は共通親のみ */
+  will-change: opacity;
 }
+#magic-circle .layer-blue    { z-index: 1; transform: scale(1);    opacity: 1; visibility: visible; }
+#magic-circle .layer-purple  { z-index: 2; transform: scale(1.05); }
+#magic-circle .layer-gold    { z-index: 3; transform: scale(1.10); }
+#magic-circle .layer-rainbow { z-index: 4; transform: scale(1.15); }
+#magic-circle .magic-circle-layer.family-visible {
+  opacity: 1;
+  visibility: visible;
+}
+#magic-circle .magic-circle-layer.family-reveal {
+  filter: brightness(1.38) saturate(1.15) drop-shadow(0 0 13px rgba(255,255,255,.7));
+}
+/* レア度が上がるほど後ろの層は控えめにして、上位色を明確にする */
+#magic-circle[data-family-color="purple"] .layer-blue { opacity: .32; }
+#magic-circle[data-family-color="gold"] .layer-blue { opacity: .20; }
+#magic-circle[data-family-color="gold"] .layer-purple { opacity: .35; }
+#magic-circle[data-family-color="rainbow"] .layer-blue,
+#magic-circle[data-family-color="rainbow"] .layer-purple,
+#magic-circle[data-family-color="rainbow"] .layer-gold { opacity: .23; }
 @media (prefers-reduced-motion: reduce) {
-  #magic-circle,
-  #magic-circle .magic-circle-image {
-    transition: none;
-    will-change: auto;
-  }
+  #magic-circle .magic-circle-rotor,
+  #magic-circle.show .magic-circle-rotor { animation: none; will-change: auto; }
+  #magic-circle .magic-circle-layer { transition: none; will-change: auto; }
 }

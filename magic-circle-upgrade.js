@@ -1,111 +1,112 @@
-/* TEST-29A: 召喚魔法陣の昇格演出（青→紫→金→虹）
-   drawTenCards() で作られた familyGachaSummonMeta.circlePlan を読み取り、
-   魔法陣の画像・光・サイズだけを切り替える。カード移動処理は変更しない。 */
+/* TEST-29B: 同心円の4レイヤーを同期回転させて段階昇格する。
+   showMagicCircle / summonCardsFromCircle を薄くラップ。
+   10枚の飛行処理には手を付けない。 */
 (function () {
   "use strict";
+  const circle = document.getElementById("magic-circle");
+  if (!circle || typeof window.showMagicCircle !== "function" ||
+      typeof window.summonCardsFromCircle !== "function") return;
 
-  const COLOR_SRC = {
-    blue: "images/summon/magic-circle-blue.png",
-    purple: "images/summon/magic-circle-purple.png",
-    gold: "images/summon/magic-circle-gold.png",
-    rainbow: "images/summon/magic-circle-rainbow.png"
+  const layers = {
+    blue: circle.querySelector(".layer-blue"),
+    purple: circle.querySelector(".layer-purple"),
+    gold: circle.querySelector(".layer-gold"),
+    rainbow: circle.querySelector(".layer-rainbow")
   };
-  const SCALE_MAP = { blue: 1, purple: 1.05, gold: 1.10, rainbow: 1.15 };
-  let lastStartedAt = 0;
+  if (Object.values(layers).some(function(x) { return !x; })) return;
 
-  function isVisible(el) {
-    if (!el) return false;
-    const style = window.getComputedStyle(el);
-    return style.display !== "none" && style.visibility !== "hidden" && parseFloat(style.opacity || "1") > 0 && el.getBoundingClientRect().width > 0;
-  }
+  const order = ["blue", "purple", "gold", "rainbow"];
+  const ROTATION_QUARTER_MS = 2000; // 元の8秒/周の90度
+  const REVEAL_MS = 380;
+  let generation = 0;
+  let showTime = 0;
+  let isSummoning = false;
+  let planForRun = null;
 
-  function getParts() {
-    return {
-      overlay: document.getElementById("summon-overlay"),
-      circle: document.getElementById("magic-circle"),
-      image: document.querySelector("#magic-circle .magic-circle-image")
-    };
-  }
+  function colorLevel(color) { return Math.max(0, order.indexOf(color)); }
 
-  function setRotationPaused(parts, paused) {
-    [parts.circle, parts.image].forEach(function (el) {
-      if (el) el.style.animationPlayState = paused ? "paused" : "running";
+  function revealTo(color, token, immediate) {
+    if (token !== generation || !circle.classList.contains("show")) return;
+    const index = colorLevel(color);
+    circle.dataset.familyColor = order[index];
+    order.forEach(function(c, i) {
+      const layer = layers[c];
+      layer.classList.toggle("family-visible", i <= index);
+      layer.classList.remove("family-reveal");
     });
-  }
-
-  function setCircleColor(parts, color) {
-    if (!parts.circle || !parts.image) return;
-    parts.circle.dataset.familyColor = color;
-    parts.circle.style.setProperty("--family-circle-scale", String(SCALE_MAP[color] || 1));
-    if (parts.image.getAttribute("src") !== COLOR_SRC[color]) {
-      parts.image.setAttribute("src", COLOR_SRC[color]);
+    if (!immediate && layers[color]) {
+      layers[color].classList.add("family-reveal");
+      setTimeout(function() {
+        if (token === generation) layers[color].classList.remove("family-reveal");
+      }, REVEAL_MS);
     }
   }
 
-  function resetCircle(parts) {
-    if (!parts.circle || !parts.image) return;
-    parts.circle.classList.remove("family-circle-impact");
-    parts.circle.dataset.familyColor = "blue";
-    parts.circle.style.setProperty("--family-circle-scale", "1");
-    parts.image.setAttribute("src", COLOR_SRC.blue);
-    setRotationPaused(parts, false);
+  function prepareRun() {
+    ++generation;
+    isSummoning = false;
+    planForRun = window.familyGachaSummonMeta && window.familyGachaSummonMeta.circlePlan;
+    const start = planForRun && planForRun.startColor || "blue";
+    // 元の表示終了アニメーションのタイマーに干渉しない。
+    circle.classList.remove("family-circle-impact");
+    circle.dataset.familyColor = start;
+    order.forEach(function(c, i) {
+      layers[c].classList.toggle("family-visible", i <= colorLevel(start));
+      layers[c].classList.remove("family-reveal");
+    });
   }
 
-  function upgradeStep(parts, color) {
-    if (!parts.circle || !parts.image) return;
-    setRotationPaused(parts, true);
-    parts.circle.classList.add("family-circle-impact");
-    window.setTimeout(function () { setCircleColor(parts, color); }, 130);
-    window.setTimeout(function () {
-      parts.circle.classList.remove("family-circle-impact");
-      setRotationPaused(parts, false);
-    }, 560);
-  }
-
-  function startPlan(meta) {
-    const parts = getParts();
-    if (!parts.overlay || !parts.circle || !parts.image) return;
-    resetCircle(parts);
-    const plan = meta && meta.circlePlan;
-    if (!plan || !Array.isArray(plan.pathColors) || plan.pathColors.length === 0) return;
-
-    if (plan.timingType === "pre") {
-      plan.pathColors.forEach(function (color, index) {
-        window.setTimeout(function () { if (isVisible(parts.overlay)) upgradeStep(parts, color); }, 200 + (index * 820));
+  const nativeShow = window.showMagicCircle;
+  window.showMagicCircle = function() {
+    prepareRun();
+    const result = nativeShow.apply(this, arguments);
+    showTime = performance.now();
+    const token = generation;
+    if (planForRun && planForRun.timingType === "pre") {
+      planForRun.pathColors.forEach(function(color, i) {
+        setTimeout(function() { revealTo(color, token, false); }, (i + 1) * ROTATION_QUARTER_MS);
       });
-      return;
+    }
+    return result;
+  };
+
+  const nativeSummon = window.summonCardsFromCircle;
+  window.summonCardsFromCircle = function(cardElements) {
+    const originalArgs = arguments;
+    const thisArg = this;
+    const plan = planForRun;
+    const token = generation;
+    let wait = 0;
+
+    if (plan && plan.timingType === "pre" && plan.pathColors.length) {
+      const preDuration = plan.pathColors.length * ROTATION_QUARTER_MS + REVEAL_MS;
+      wait = Math.max(0, Math.ceil(showTime + preDuration - performance.now()));
     }
 
-    const interval = plan.summonIntervalMs || 650;
-    plan.pathColors.forEach(function (color, index) {
-      const afterCard = plan.stepCardIndices[index] || (2 + index * 2);
-      const delay = Math.max(450, (afterCard * interval) + 130);
-      window.setTimeout(function () { if (isVisible(parts.overlay)) upgradeStep(parts, color); }, delay);
-    });
-  }
-
-  function tick() {
-    const meta = window.familyGachaSummonMeta;
-    const parts = getParts();
-    if (!meta || !parts.overlay || !parts.circle || !parts.image) return;
-    const plan = meta.circlePlan;
-    if (!plan) return;
-
-    if (!isVisible(parts.overlay)) {
-      if (plan.started) {
-        plan.started = false;
-        plan.finishedAt = Date.now();
+    const startCards = function() {
+      if (token !== generation) return Promise.resolve();
+      isSummoning = true;
+      if (plan && plan.timingType === "mid") {
+        const interval = plan.summonIntervalMs || 650;
+        plan.pathColors.forEach(function(color, index) {
+          const after = plan.stepCardIndices[index] || (2 + index * 2);
+          // 2枚目〜7枚目付近。既存のカード移動時間に変更なし。
+          setTimeout(function() {
+            if (isSummoning) revealTo(color, token, false);
+          }, Math.max(450, after * interval));
+        });
       }
-      return;
-    }
-
-    if (plan.started) return;
-    const token = plan.plannedAt || Date.now();
-    if (token === lastStartedAt) return;
-    plan.started = true;
-    lastStartedAt = token;
-    startPlan(meta);
-  }
-
-  window.setInterval(tick, 120);
+      return Promise.resolve(nativeSummon.apply(thisArg, originalArgs)).then(function(v) {
+        if (token === generation) isSummoning = false;
+        return v;
+      }, function(e) {
+        if (token === generation) isSummoning = false;
+        throw e;
+      });
+    };
+    if (!wait) return startCards();
+    return new Promise(function(resolve, reject) {
+      setTimeout(function() { startCards().then(resolve, reject); }, wait);
+    });
+  };
 })();

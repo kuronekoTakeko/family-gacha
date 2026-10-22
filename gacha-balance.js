@@ -90,13 +90,36 @@
   function buildCirclePlan(results, isGodTen) {
     const highestRarity = getHighestRarity(results);
     const finalColor = chooseFinalCircle(highestRarity);
-    const pathColors = chooseUpgradePath(finalColor);
+    // 特別な初期色。15%は暫定値（最終色の確率はそのまま）。
+    // ここでは最終色までしか選ばないため、期待外れの色は絶対に出ない。
+    const colorLevel = { blue: 0, purple: 1, gold: 2, rainbow: 3 };
+    const startCandidates = ["purple", "gold", "rainbow"].filter(function(color) {
+      return colorLevel[color] <= colorLevel[finalColor];
+    });
+    const startColor = startCandidates.length && Math.random() < 0.15
+      ? startCandidates[Math.floor(Math.random() * startCandidates.length)]
+      : "blue";
+
+    // 途中昇格は通常／飛び級を混ぜる（元の選択率を保持）。
+    const roughPath = chooseUpgradePath(finalColor).filter(function(color) {
+      return colorLevel[color] > colorLevel[startColor];
+    });
+    // 最終色まで必ず到達させる。
+    const pathColors = roughPath.length || startColor === finalColor
+      ? roughPath : [finalColor];
     const timing = chooseTiming(pathColors.length);
+    // 召喚前は90度ごとの段階演出を優先し、飛び級しない。
+    const sequentialColors = ["purple", "gold", "rainbow"].filter(function(color) {
+      return colorLevel[color] > colorLevel[startColor] &&
+             colorLevel[color] <= colorLevel[finalColor];
+    });
+    const actualPath = timing.type === "pre" ? sequentialColors : pathColors;
     return {
       isGodTen: isGodTen,
       highestRarity: highestRarity,
       finalColor: finalColor,
-      pathColors: pathColors,
+      startColor: startColor,
+      pathColors: actualPath,
       timingType: timing.type,
       stepCardIndices: timing.cardIndices,
       summonIntervalMs: SUMMON_INTERVAL_MS,
@@ -130,7 +153,7 @@
     })();
 
     const meta = {
-      version: "29A",
+      version: "29B",
       isGodTen: isGodTen,
       godTenChance: GOD_TEN_CHANCE,
       circlePlan: buildCirclePlan(results, isGodTen)
@@ -142,5 +165,5 @@
   };
 
   const badge = document.getElementById("version-check-badge");
-  if (badge) badge.textContent = "TEST -29A / JS OK";
+  if (badge) badge.textContent = "TEST -29B / JS OK";
 })();
