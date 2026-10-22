@@ -1,4 +1,4 @@
-/* TEST-29D2: 召喚途中カードの中央拡大と「？」の円の中心合わせ。
+/* TEST-29D3: 召喚途中カードの中央拡大と「？」の円の中心合わせ。
    760msの7キーフレームに限定。既存の移動ルート・集合位置・開封処理は維持。 */
 (function () {
   "use strict";
@@ -13,8 +13,8 @@
       const ringDiameter = circle ? circle.offsetWidth : 320;
       const naturalCardHeight = this.offsetHeight;
       if (naturalCardHeight > 0) {
-        // カードの縦幅を青い太い円の内側に収める。最大1.70倍（29D2：前回より約10%大きく）。
-        const centerScale = Math.min(1.70, Math.max(.84, ringDiameter * .86 / naturalCardHeight));
+        // カードの縦幅を青い太い円の内側に収める。最大2.00倍（29D3：29D2から中央停止時だけ拡大）。
+        const centerScale = Math.min(2.00, Math.max(.84, ringDiameter * .86 / naturalCardHeight));
         const scales = [null, null, centerScale, centerScale, Math.max(.84, centerScale * .75), .84, .84];
         // summon.js の停止位置は circle center - 18px。中央で「？」が合うよう補正。
         // 左上へ飛行している間は補正を自然にゼロへ戻し、集合位置は従来どおり。
