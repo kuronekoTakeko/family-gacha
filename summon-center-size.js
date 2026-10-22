@@ -1,4 +1,4 @@
-/* TEST-29B: 中央で止まる10枚召喚カードだけを少し拡大。
+/* TEST-29C: 召喚途中カードの中央拡大と「？」の円の中心合わせ。
    760msの7キーフレームに限定。既存の移動ルート・集合位置・開封処理は維持。 */
 (function () {
   "use strict";
@@ -16,13 +16,16 @@
         // カードの縦幅を青い太い円の内側に収める。最大1.55倍。
         const centerScale = Math.min(1.55, Math.max(.84, ringDiameter * .78 / naturalCardHeight));
         const scales = [null, null, centerScale, centerScale, Math.max(.84, centerScale * .75), .84, .84];
+        // summon.js の停止位置は circle center - 18px。中央で「？」が合うよう補正。
+        // 左上へ飛行している間は補正を自然にゼロへ戻し、集合位置は従来どおり。
+        const centerOffsetsY = [18, 18, 18, 18, 9, 3, 0];
         const patched = frames.map(function(frame, i) {
           const match = transformRE.exec(frame.transform);
-          if (!match || scales[i] == null) return frame;
+          if (!match) return frame;
           const before = Number(match[3]);
-          const after = scales[i];
+          const after = scales[i] == null ? before : scales[i];
           if (!Number.isFinite(before) || !Number.isFinite(after)) return frame;
-          const newY = Number(match[2]) + (after - before) * naturalCardHeight / 2;
+          const newY = Number(match[2]) + (after - before) * naturalCardHeight / 2 + centerOffsetsY[i];
           return Object.assign({}, frame, {
             transform: "translate(" + match[1] + "px, " + newY + "px) scale(" + after + ") rotate(" + match[4] + "deg)"
           });

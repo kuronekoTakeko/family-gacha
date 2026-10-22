@@ -328,7 +328,16 @@
     <!-- TEST-28F: 排出確率を調整／10連SR以上保証を撤廃 -->
     <script src="gacha-balance.js?v=29B"></script>
     <script src="magic-circle-upgrade.js?v=29B"></script>
-    <script src="summon-center-size.js?v=29B"></script>
+    <script src="summon-center-size.js?v=29C"></script>
+    <script>
+      // TEST-29C: 中央召喚カード位置補正の読み込み確認
+      (function () {
+        const badge = document.getElementById("version-check-badge");
+        if (badge && Element.prototype.__family29BSizePatch) {
+          badge.textContent = "TEST -29C / JS OK";
+        }
+      })();
+    </script>
 
 </body>
 </html>
