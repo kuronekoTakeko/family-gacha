@@ -97,28 +97,28 @@ const cardPool = [
   {
     id: "card014",
     number: 14,
-    name: "SSRカード014（仮）",
+    name: "ロッツォにいやされて",
     rarity: "SSR",
     image: "images/cards/card014.webp"
   },
   {
     id: "card015",
     number: 15,
-    name: "SSRカード015（仮）",
+    name: "一触即発　チソカとチロロ",
     rarity: "SSR",
     image: "images/cards/card015.webp"
   },
   {
     id: "card016",
     number: 16,
-    name: "SSRカード016（仮）",
+    name: "かーめーはーめーへー",
     rarity: "SSR",
     image: "images/cards/card016.webp"
   },
   {
     id: "card017",
     number: 17,
-    name: "URカード017（仮）",
+    name: "T4会議 in ひろしま",
     rarity: "UR",
     image: "images/cards/card017.webp"
   }

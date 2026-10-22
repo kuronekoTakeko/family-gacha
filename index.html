@@ -11,7 +11,7 @@
 
 <body class="home-viewport screen-scroll-locked">
   <!-- 更新確認用: STEP 7。表示位置には影響しません。 -->
-  <div id="version-check-badge" aria-label="テストバージョン" style="position:fixed;top:8px;right:8px;z-index:2147483647;padding:5px 8px;border-radius:6px;background:#172b42;color:#ffffff;border:1px solid #75cfff;font:700 11px/1.4 system-ui,sans-serif;pointer-events:none;box-shadow:0 2px 8px #0008;">TEST -28 / HTML</div>
+  <div id="version-check-badge" aria-label="テストバージョン" style="position:fixed;top:8px;right:8px;z-index:2147483647;padding:5px 8px;border-radius:6px;background:#172b42;color:#ffffff;border:1px solid #75cfff;font:700 11px/1.4 system-ui,sans-serif;pointer-events:none;box-shadow:0 2px 8px #0008;">TEST -28E17 / HTML</div>
 
   <main class="app">
 
@@ -73,7 +73,7 @@
       </div>
 
         <p class="gacha-message">
-            好きなカードを選んでオープン！
+            好きなオードを選んでオープン！
         </p>
 
         <div id="card-grid" class="card-grid">
@@ -209,7 +209,7 @@
     </option>
 
     <option value="number">
-      カード番号順
+      オード番号順
     </option>
 
     <option value="obtained">
@@ -230,7 +230,7 @@
 
   </section>
 
-  <!-- カード詳細画面 -->
+  <!-- オード詳細画面 -->
 <section id="detail-screen" class="screen">
 
   <div class="gacha-screen">
@@ -241,7 +241,7 @@
         ←
       </button>
 
-      <h2>カード詳細</h2>
+      <h2>オード詳細</h2>
 
     </div>
 
@@ -257,13 +257,13 @@
 <div id="individual-reveal" class="individual-reveal" role="dialog"
      aria-modal="true" aria-label="カード個別開封" aria-hidden="true" tabindex="-1">
   <div class="individual-reveal-effect" aria-hidden="true"></div>
-  <!-- STEP 22: R専用の青い回転エフェクト。カード背後のみ。 -->
+  <!-- STEP 22: R専用の青い回転エフェクト。オード背後のみ。 -->
   <div class="individual-reveal-r-aura" aria-hidden="true"></div>
-  <!-- STEP 23: SSR専用の金色回転エフェクト。カードの背後のみ。 -->
+  <!-- STEP 23: SSR専用の金色回転エフェクト。オードの背後のみ。 -->
   <div class="individual-reveal-ssr-aura" aria-hidden="true"></div>
   <!-- STEP 16: SRだけに表示する軽量な紫の惑星風エフェクト -->
   <div class="individual-reveal-sr-orbit" aria-hidden="true"></div>
-  <!-- STEP 18: SR専用の交差公転光2つ。各光を前後2層に描き分けてカードを回り込ませる。 -->
+  <!-- STEP 18: SR専用の交差公転光2つ。各光を前後2層に描き分けてオードを回り込ませる。 -->
   <div class="individual-reveal-sr-traveler individual-reveal-sr-traveler-back" aria-hidden="true">
     <div class="sr-orbit-path sr-orbit-path-left"><div class="sr-orbit-rotor"><div class="sr-orbit-spark"></div></div></div>
     <div class="sr-orbit-path sr-orbit-path-right"><div class="sr-orbit-rotor"><div class="sr-orbit-spark"></div></div></div>
@@ -273,7 +273,7 @@
     <div class="sr-orbit-path sr-orbit-path-right"><div class="sr-orbit-rotor"><div class="sr-orbit-spark"></div></div></div>
   </div>
   <div id="individual-reveal-card" class="individual-reveal-card"><span class="individual-card-question">?</span></div>
-  <div id="individual-reveal-hint" class="individual-reveal-hint">カードを召喚中…</div>
+  <div id="individual-reveal-hint" class="individual-reveal-hint">オードを召喚中…</div>
 </div>
     <div id="summon-overlay" class="summon-overlay">
 
@@ -283,9 +283,39 @@
 
 </div>
 
-    <script src="cards.js?v=9"></script>
+    <script src="cards.js?v=28E17"></script>
     <script src="summon.js?v=15"></script>
     <script src="app.js?v=28"></script>
+    <!-- TEST-28E17: カード014〜017の表示名だけ、既存アルバム保存記録と同期 -->
+    <script>
+      (function () {
+        try {
+          const key = "family-gacha-album";
+          const raw = localStorage.getItem(key);
+          if (raw !== null) {
+            const saved = JSON.parse(raw);
+            if (saved && typeof saved === "object" && !Array.isArray(saved)) {
+              let changed = false;
+              ["card014", "card015", "card016", "card017"].forEach(function (id) {
+                const card = cardPool.find(function (item) { return item.id === id; });
+                if (card && saved[id] && saved[id].name !== card.name) {
+                  saved[id].name = card.name;
+                  changed = true;
+                }
+              });
+              if (changed) localStorage.setItem(key, JSON.stringify(saved));
+            }
+          }
+        } catch (error) {
+          // 保存が使えない場合もゲームは止めない。
+        }
+        const badge = document.getElementById("version-check-badge");
+        if (badge && cardPool.length === 17 &&
+            cardPool.some(function (card) { return card.id === "card017" && card.rarity === "UR"; })) {
+          badge.textContent = "TEST -28E17 / JS OK";
+        }
+      })();
+    </script>
 
 </body>
 </html>
