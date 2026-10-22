@@ -13,21 +13,21 @@ const cardPool = [
   {
     id: "card002",
     number: 2,
-    name: '"M"',
+    name: "\"M\"",
     rarity: "N",
     image: "images/cards/card002.webp"
   },
   {
     id: "card003",
     number: 3,
-    name: 'クレイマスカレード"C"',
+    name: "クレイマスカレード\"C\"",
     rarity: "N",
     image: "images/cards/card003.webp"
   },
   {
     id: "card004",
     number: 4,
-    name: 'オジサン"Y"',
+    name: "オジサン\"Y\"",
     rarity: "N",
     image: "images/cards/card004.webp"
   },
@@ -41,14 +41,14 @@ const cardPool = [
   {
     id: "card006",
     number: 6,
-    name: 'プリンセス"M"',
+    name: "プリンセス\"M\"",
     rarity: "R",
     image: "images/cards/card006.webp"
   },
   {
     id: "card007",
     number: 7,
-    name: 'おしゃれマザー"C"',
+    name: "おしゃれマザー\"C\"",
     rarity: "R",
     image: "images/cards/card007.webp"
   },
@@ -62,21 +62,21 @@ const cardPool = [
   {
     id: "card009",
     number: 9,
-    name: '奇声の"アマーザ"',
+    name: "奇声の\"アマーザ\"",
     rarity: "SR",
     image: "images/cards/card009.webp"
   },
   {
     id: "card010",
     number: 10,
-    name: 'マジカルプリンセス"M"',
+    name: "マジカルプリンセス\"M\"",
     rarity: "SR",
     image: "images/cards/card010.webp"
   },
   {
     id: "card011",
     number: 11,
-    name: '奇術師"チソカ"',
+    name: "奇術師\"チソカ\"",
     rarity: "SR",
     image: "images/cards/card011.webp"
   },
@@ -90,8 +90,36 @@ const cardPool = [
   {
     id: "card013",
     number: 13,
-    name: '上弦の32"アマザ"',
+    name: "上弦の32\"アマザ\"",
     rarity: "SSR",
     image: "images/cards/card013.webp"
+  },
+  {
+    id: "card014",
+    number: 14,
+    name: "SSRカード014（仮）",
+    rarity: "SSR",
+    image: "images/cards/card014.webp"
+  },
+  {
+    id: "card015",
+    number: 15,
+    name: "SSRカード015（仮）",
+    rarity: "SSR",
+    image: "images/cards/card015.webp"
+  },
+  {
+    id: "card016",
+    number: 16,
+    name: "SSRカード016（仮）",
+    rarity: "SSR",
+    image: "images/cards/card016.webp"
+  },
+  {
+    id: "card017",
+    number: 17,
+    name: "URカード017（仮）",
+    rarity: "UR",
+    image: "images/cards/card017.webp"
   }
 ];
