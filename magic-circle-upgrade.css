@@ -1,0 +1,30 @@
+/* TEST-29A: 召喚魔法陣の昇格演出用の追加CSS
+   既存の召喚アニメーションやカードの移動には触れない。 */
+#magic-circle {
+  --family-circle-scale: 1;
+  --family-circle-glow: rgba(120, 210, 255, 0.55);
+  scale: var(--family-circle-scale);
+  transition: scale 360ms ease, filter 240ms ease, opacity 240ms ease;
+  will-change: scale, filter, opacity;
+}
+#magic-circle .magic-circle-image {
+  transition: filter 220ms ease, opacity 220ms ease;
+  will-change: filter, opacity;
+}
+#magic-circle[data-family-color="blue"]    { --family-circle-glow: rgba(120, 210, 255, 0.55); }
+#magic-circle[data-family-color="purple"]  { --family-circle-glow: rgba(174, 120, 255, 0.62); }
+#magic-circle[data-family-color="gold"]    { --family-circle-glow: rgba(255, 212, 92, 0.70); }
+#magic-circle[data-family-color="rainbow"] { --family-circle-glow: rgba(255, 255, 255, 0.85); }
+#magic-circle.family-circle-impact {
+  filter: drop-shadow(0 0 16px var(--family-circle-glow)) drop-shadow(0 0 34px var(--family-circle-glow));
+}
+#magic-circle.family-circle-impact .magic-circle-image {
+  filter: brightness(1.25) saturate(1.15);
+}
+@media (prefers-reduced-motion: reduce) {
+  #magic-circle,
+  #magic-circle .magic-circle-image {
+    transition: none;
+    will-change: auto;
+  }
+}
