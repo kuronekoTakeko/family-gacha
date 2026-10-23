@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>STEP 29E 高レア個別開封テスト｜ファミリーガチャ</title>
+<style>
+html,body { margin:0; width:100%; height:100%; overflow:hidden; background:#0b0b0b; }
+#game-frame { position:fixed; inset:0; display:block; width:100%; height:100vh; height:100dvh; border:0; }
+#test-status { position:fixed; bottom:max(10px,env(safe-area-inset-bottom)); left:10px; z-index:2147483647;
+ pointer-events:none; max-width:min(88vw,360px); padding:7px 10px; color:white; background:rgba(18,43,66,.94);
+ border:1px solid #78ceff; border-radius:8px; font:600 12px/1.45 system-ui,sans-serif;
+ box-shadow:0 3px 14px rgba(0,0,0,.35); }
+#test-status.error { background:#692b29; border-color:#ffada4; }
+</style>
+</head>
+<body>
+<iframe id="game-frame" src="./index.html?rare-reveal-test=29E" title="ファミリーガチャ"></iframe>
+<div id="test-status" role="status" aria-live="polite">STEP 29E テスト準備中…</div>
+<script>
+(function(){
+  "use strict";
+  const frame = document.getElementById("game-frame");
+  const status = document.getElementById("test-status");
+  function report(message, error){
+    status.textContent = message;
+    status.classList.toggle("error", !!error);
+  }
+  frame.addEventListener("load", function(){
+    try {
+      const game = frame.contentWindow;
+      if (!game || typeof game.drawTenCards !== "function" ||
+          typeof game.saveCurrentResultsToAlbum !== "function") {
+        throw new Error("ゲームの機能が読み込まれていません");
+      }
+      // cards.js declares cardPool with top-level const, which is not a window property.
+      const pool = game.eval("cardPool");
+      if (!Array.isArray(pool)) throw new Error("カード一覧を取得できません");
+      const badge = game.document.getElementById("version-check-badge");
+      if (!badge || !badge.textContent.includes("29D5D")) {
+        throw new Error("ゲーム本体のバージョンが29D5Dではありません");
+      }
+      const cardByNumber = new Map(pool.map(function(card){return [card.number, card];}));
+      const numbers = [9,13,17,10,14,11,15,12,16,5];
+      const originals = numbers.map(function(num){
+        const card = cardByNumber.get(num);
+        if(!card) throw new Error("カードNo." + num + "を確認できません");
+        return Object.assign({}, card);
+      });
+      if (!originals.some(c=>c.rarity==="SR") ||
+          !originals.some(c=>c.rarity==="SSR") ||
+          !originals.some(c=>c.rarity==="UR")) {
+        throw new Error("高レア3種類のデータが不足しています");
+      }
+      // The iframe inherits the site's origin, but the test page never writes, clears or resets album data.
+      // Override the one save function used by individual/bulk-open and results screen.
+      game.saveCurrentResultsToAlbum = function(){ return new game.Set(); };
+      const originalDraw = game.drawTenCards;
+      let pending = true;
+      game.drawTenCards = function(){
+        if (!pending) return originalDraw.apply(this,arguments);
+        pending = false;
+        // Restore the original draw function for all future presses in this iframe.
+        game.drawTenCards = originalDraw;
+        const results = originals.map(function(card){return Object.assign({},card);});
+        const meta = {
+          version:"29E-test-only",
+          isGodTen:false,
+          godTenChance:0.01,
+          circlePlan:{
+            isGodTen:false, guardianVariant:null, highestRarity:"UR",
+            startColor:"blue", finalColor:"blue", pathColors:[],
+            timingType:"none", stepCardIndices:[],
+            summonIntervalMs:650, plannedAt:Date.now()
+          }
+        };
+        game.familyGachaSummonMeta = meta;
+        game.dispatchEvent(new game.CustomEvent("family-gacha:draw-ready",{detail:meta}));
+        report("高レア検証中：No.009(SR)・013(SSR)・017(UR)など｜アルバム保存なし");
+        return results;
+      };
+      report("STEP 29E 準備OK｜最初の10連でSR・SSR・URを確定配置／保存なし");
+    } catch (error){
+      report("STEP 29E 準備失敗：" + error.message, true);
+      console.error("[Family Gacha 29E]",error);
+    }
+  });
+})();
+</script>
+</body>
+</html>
