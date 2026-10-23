@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>神10連 演出テスト｜ファミリーガチャ</title>
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #0b0b0b; }
+    #game-frame { position: fixed; inset: 0; display: block; width: 100%; height: 100vh; height: 100dvh; border: 0; }
+    #test-status {
+      position: fixed; bottom: max(10px, env(safe-area-inset-bottom)); left: 10px;
+      z-index: 2147483647; pointer-events: none;
+      max-width: min(88vw, 330px); padding: 7px 10px;
+      color: white; background: rgba(18, 43, 66, .92);
+      border: 1px solid #78ceff; border-radius: 8px;
+      font: 600 12px/1.45 system-ui, sans-serif;
+      box-shadow: 0 3px 14px rgba(0,0,0,.35);
+    }
+    #test-status.error { background: #692b29; border-color: #ffada4; }
+  </style>
+</head>
+<body>
+  <!-- ゲーム本体は変更せず、同一オリジンの既存ページをそのまま表示します。 -->
+  <iframe id="game-frame" src="./index.html" title="ファミリーガチャ"></iframe>
+  <div id="test-status" role="status" aria-live="polite">神10連テストを準備中…</div>
+  <script>
+  (function () {
+    'use strict';
+    const frame = document.getElementById('game-frame');
+    const status = document.getElementById('test-status');
+
+    function report(message, error) {
+      status.textContent = message;
+      status.classList.toggle('error', !!error);
+    }
+
+    frame.addEventListener('load', function () {
+      try {
+        const game = frame.contentWindow;
+        // 実際のSTEP 29D3の抽選関数・守護神演出を使用する。
+        if (!game || typeof game.drawTenCards !== 'function' ||
+            typeof game.saveCurrentResultsToAlbum !== 'function') {
+          throw new Error('ゲームの準備が確認できません');
+        }
+
+        // この専用ページだけ、テストカードのアルバム保存を無効化する。
+        // 元のアルバムには一切書き込まない。削除や初期化もしない。
+        game.saveCurrentResultsToAlbum = function () {
+          return new game.Set();
+        };
+
+        const normalDraw = game.drawTenCards;
+        let testPending = true;
+        game.drawTenCards = function () {
+          if (!testPending) return normalDraw.apply(this, arguments);
+          testPending = false;
+          game.drawTenCards = normalDraw; // 次回以降は必ず通常抽選
+
+          const randomOriginal = game.Math.random;
+          let firstRandom = true;
+          game.Math.random = function () {
+            if (firstRandom) {
+              firstRandom = false;
+              return 0; // 神10連の判定（0 < 0.01）にのみ使用
+            }
+            return randomOriginal();
+          };
+
+          try {
+            const results = normalDraw.apply(this, arguments);
+            const meta = game.familyGachaSummonMeta;
+            if (!meta || !meta.isGodTen || results.length !== 10 ||
+                !results.every(function (card) {
+                  return ['SR', 'SSR', 'UR'].includes(card.rarity);
+                })) {
+              throw new Error('神10連の抽選結果を確認できません');
+            }
+            report('神10連 実行中｜テスト結果は保存しません');
+            return results;
+          } finally {
+            game.Math.random = randomOriginal; // 必ず元に戻す
+          }
+        };
+
+        report('神10連テスト準備OK｜最初の10連だけ確定・保存なし');
+      } catch (error) {
+        report('テストの準備に失敗しました。通常ページで遊んでください。', true);
+        console.error('[Family Gacha God Ten Test]', error);
+      }
+    });
+  })();
+  </script>
+</body>
+</html>
