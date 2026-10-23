@@ -1,5 +1,4 @@
-/* TEST-29D2: 神10連1%＋守護神降臨＋特殊スタート確率調整
-   app.js本体は触らず、抽選結果と演出メタ情報だけを上書きする。 */
+/* TEST-29D5: 神10連1%＋守護神降臨＋特殊スタート確率調整 */
 (function () {
   "use strict";
 
@@ -111,6 +110,32 @@
 
   function buildCirclePlan(results, isGodTen) {
     const highestRarity = getHighestRarity(results);
+
+    if (isGodTen) {
+      const finalColor = highestRarity === "UR" ? "rainbow"
+        : highestRarity === "SSR" ? "gold"
+        : "purple";
+      const guardianVariant = highestRarity === "UR" ? "duo"
+        : highestRarity === "SSR" ? "male"
+        : "female";
+      const pathColors = colorOrder.filter(function (color) {
+        return colorLevel(color) > colorLevel("blue") &&
+               colorLevel(color) <= colorLevel(finalColor);
+      });
+      return {
+        isGodTen: true,
+        guardianVariant: guardianVariant,
+        highestRarity: highestRarity,
+        startColor: "blue",
+        finalColor: finalColor,
+        pathColors: pathColors,
+        timingType: "god-pre",
+        stepCardIndices: [],
+        summonIntervalMs: SUMMON_INTERVAL_MS,
+        plannedAt: Date.now()
+      };
+    }
+
     const finalColor = chooseFinalCircle(highestRarity);
     const startColor = chooseSpecialStart(finalColor);
 
@@ -126,7 +151,8 @@
     const actualPath = timing.type === "pre" ? sequentialColors : pathColors;
 
     return {
-      isGodTen: isGodTen,
+      isGodTen: false,
+      guardianVariant: null,
       highestRarity: highestRarity,
       startColor: startColor,
       finalColor: finalColor,
@@ -169,7 +195,7 @@
     })();
 
     const meta = {
-      version: "29D2",
+      version: "29D5",
       isGodTen: isGodTen,
       godTenChance: GOD_TEN_CHANCE,
       circlePlan: buildCirclePlan(results, isGodTen)
@@ -181,5 +207,5 @@
   };
 
   const badge = document.getElementById("version-check-badge");
-  if (badge) badge.textContent = "TEST -29D2 / JS OK";
+  if (badge) badge.textContent = "TEST -29D5 / JS OK";
 })();

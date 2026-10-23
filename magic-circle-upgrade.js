@@ -1,4 +1,4 @@
-/* TEST-29D2: 4層魔法陣・90度昇格・神10連の守護神降臨 */
+/* TEST-29D5: 4層魔法陣・90度昇格・神10連の守護神降臨（神→降→臨 演出対応） */
 (function () {
   "use strict";
   const overlay = document.getElementById("summon-overlay");
@@ -8,6 +8,12 @@
 
   const rotor = circle.querySelector(".magic-circle-rotor");
   const guardian = document.getElementById("god-ten-guardian");
+  if (!guardian) return;
+
+  const guardianShadow = guardian.querySelector(".god-ten-guardian__shadow");
+  const guardianFigure = guardian.querySelector(".god-ten-guardian__figure");
+  const guardianTitle = guardian.querySelector(".god-ten-guardian__title");
+
   const layers = {
     blue: circle.querySelector(".layer-blue"),
     purple: circle.querySelector(".layer-purple"),
@@ -19,13 +25,29 @@
   const order = ["blue", "purple", "gold", "rainbow"];
   const ROTATION_QUARTER_MS = 2000;
   const REVEAL_MS = 380;
+
   const GOD_FREEZE_DELAY_MS = 850;
   const GOD_SHADOW_MS = 480;
   const GOD_WHITE_MS = 620;
-  const GOD_REVEAL_MS = 1240;
-  const GOD_HOLD_MS = 780;
-  const GOD_FADE_MS = 520;
-  const GOD_TOTAL_MS = GOD_FREEZE_DELAY_MS + GOD_SHADOW_MS + GOD_WHITE_MS + GOD_REVEAL_MS + GOD_HOLD_MS + GOD_FADE_MS;
+  const GOD_REVEAL_MS = 1100;
+  const GOD_HOLD_MS = 180;
+  const KANJI_SHOW_MS = 260;
+  const KANJI_GAP_MS = 160;
+  const KANJI_CLEAR_MS = 160;
+  const UPGRADE_STEP_MS = 620;
+  const UPGRADE_HOLD_MS = 260;
+  const GUARDIAN_EXIT_MS = 520;
+
+  const GUARDIAN_ASSETS = {
+    male: "images/summon/guardian-god-male.webp",
+    female: "images/summon/guardian-god-female.webp",
+    duo: "images/summon/guardian-god-duo.webp"
+  };
+  const KANJI_ASSETS = {
+    shin: "images/summon/god-kanji-shin.webp",
+    kou: "images/summon/god-kanji-kou.webp",
+    rin: "images/summon/god-kanji-rin.webp"
+  };
 
   let generation = 0;
   let showTime = 0;
@@ -34,14 +56,60 @@
 
   function colorLevel(color) { return Math.max(0, order.indexOf(color)); }
 
+  function getSequentialColors(startColor, finalColor) {
+    const startLevel = colorLevel(startColor);
+    const finalLevel = colorLevel(finalColor);
+    return order.filter(function (color) {
+      const level = colorLevel(color);
+      return level > startLevel && level <= finalLevel;
+    });
+  }
+
+  function ensureKanjiContainer() {
+    let container = overlay.querySelector("#god-ten-kanji");
+    if (container) return container;
+
+    container = document.createElement("div");
+    container.id = "god-ten-kanji";
+    container.setAttribute("aria-hidden", "true");
+
+    [
+      { key: "shin", alt: "神" },
+      { key: "kou", alt: "降" },
+      { key: "rin", alt: "臨" }
+    ].forEach(function (item) {
+      const img = document.createElement("img");
+      img.className = "god-ten-kanji__char god-ten-kanji__char--" + item.key;
+      img.dataset.kanji = item.key;
+      img.alt = "";
+      img.decoding = "async";
+      img.src = KANJI_ASSETS[item.key];
+      container.appendChild(img);
+    });
+
+    overlay.appendChild(container);
+    return container;
+  }
+
+  const kanjiContainer = ensureKanjiContainer();
+
   function clearGuardianClasses() {
     overlay.classList.remove(
       "family-god-shadow",
       "family-god-white",
       "family-god-rainbow",
       "family-god-reveal",
-      "family-god-exit"
+      "family-god-summon",
+      "family-god-exit",
+      "family-god-kanji-active"
     );
+  }
+
+  function clearKanjiClasses() {
+    if (!kanjiContainer) return;
+    kanjiContainer.querySelectorAll(".god-ten-kanji__char").forEach(function (node) {
+      node.classList.remove("show");
+    });
   }
 
   function setRotationPaused(paused) {
@@ -66,13 +134,23 @@
     }
   }
 
+  function setGuardianVariant(variant) {
+    const src = GUARDIAN_ASSETS[variant] || GUARDIAN_ASSETS.male;
+    if (guardianShadow) guardianShadow.src = src;
+    if (guardianFigure) guardianFigure.src = src;
+    guardian.dataset.variant = variant || "male";
+  }
+
   function prepareRun() {
     ++generation;
     isSummoning = false;
     planForRun = window.familyGachaSummonMeta && window.familyGachaSummonMeta.circlePlan;
     const start = planForRun && planForRun.startColor || "blue";
     clearGuardianClasses();
+    clearKanjiClasses();
     setRotationPaused(false);
+    setGuardianVariant(planForRun && planForRun.guardianVariant || "male");
+    if (guardianTitle) guardianTitle.style.display = "none";
     circle.dataset.familyColor = start;
     order.forEach(function (c, i) {
       layers[c].classList.toggle("family-visible", i <= colorLevel(start));
@@ -80,30 +158,83 @@
     });
   }
 
-  function playGuardianSequence(token) {
-    if (!planForRun || !planForRun.isGodTen) return;
+  function scheduleKanjiBurst(token, startAt) {
+    const sequence = ["shin", "kou", "rin"];
+    sequence.forEach(function (key, index) {
+      const node = kanjiContainer.querySelector('[data-kanji="' + key + '"]');
+      const onAt = startAt + index * (KANJI_SHOW_MS + KANJI_GAP_MS);
+      const offAt = onAt + KANJI_SHOW_MS;
+      setTimeout(function () {
+        if (token !== generation || !circle.classList.contains("show")) return;
+        overlay.classList.add("family-god-kanji-active");
+        if (node) node.classList.add("show");
+      }, onAt);
+      setTimeout(function () {
+        if (token !== generation) return;
+        if (node) node.classList.remove("show");
+      }, offAt);
+    });
+    const total = sequence.length * KANJI_SHOW_MS + (sequence.length - 1) * KANJI_GAP_MS;
+    setTimeout(function () {
+      if (token !== generation) return;
+      overlay.classList.remove("family-god-kanji-active");
+      clearKanjiClasses();
+    }, startAt + total + KANJI_CLEAR_MS);
+    return total + KANJI_CLEAR_MS;
+  }
+
+  function scheduleGodUpgrades(token, startAt) {
+    const path = planForRun && planForRun.pathColors || [];
+    path.forEach(function (color, index) {
+      setTimeout(function () {
+        if (token !== generation || !circle.classList.contains("show")) return;
+        revealTo(color, token, false);
+      }, startAt + index * UPGRADE_STEP_MS);
+    });
+    return path.length ? path.length * UPGRADE_STEP_MS + UPGRADE_HOLD_MS : 0;
+  }
+
+  function playGuardianEntrance(token) {
+    if (!planForRun || !planForRun.isGodTen) return 0;
+
     setTimeout(function () {
       if (token !== generation || !circle.classList.contains("show")) return;
       setRotationPaused(true);
       overlay.classList.add("family-god-shadow");
     }, GOD_FREEZE_DELAY_MS);
+
     setTimeout(function () {
       if (token !== generation || !circle.classList.contains("show")) return;
       overlay.classList.add("family-god-white");
     }, GOD_FREEZE_DELAY_MS + GOD_SHADOW_MS);
+
     setTimeout(function () {
       if (token !== generation || !circle.classList.contains("show")) return;
       overlay.classList.add("family-god-rainbow", "family-god-reveal");
     }, GOD_FREEZE_DELAY_MS + GOD_SHADOW_MS + GOD_WHITE_MS);
+
+    let cursor = GOD_FREEZE_DELAY_MS + GOD_SHADOW_MS + GOD_WHITE_MS + GOD_REVEAL_MS + GOD_HOLD_MS;
+    cursor += scheduleKanjiBurst(token, cursor);
+    cursor += scheduleGodUpgrades(token, cursor);
+
     setTimeout(function () {
       if (token !== generation || !circle.classList.contains("show")) return;
-      overlay.classList.add("family-god-exit");
       setRotationPaused(false);
-    }, GOD_FREEZE_DELAY_MS + GOD_SHADOW_MS + GOD_WHITE_MS + GOD_REVEAL_MS + GOD_HOLD_MS);
+      overlay.classList.add("family-god-summon");
+    }, cursor);
+
+    return cursor;
+  }
+
+  function exitGuardianAfterSummon(token) {
+    if (!planForRun || !planForRun.isGodTen) return;
+    overlay.classList.add("family-god-exit");
+    overlay.classList.remove("family-god-summon");
     setTimeout(function () {
       if (token !== generation) return;
       clearGuardianClasses();
-    }, GOD_TOTAL_MS + 50);
+      clearKanjiClasses();
+    }, GUARDIAN_EXIT_MS + 50);
   }
 
   const nativeShow = window.showMagicCircle;
@@ -112,15 +243,12 @@
     const result = nativeShow.apply(this, arguments);
     showTime = performance.now();
     const token = generation;
-    const baseDelay = planForRun && planForRun.isGodTen ? GOD_TOTAL_MS : 0;
+    const baseDelay = planForRun && planForRun.isGodTen ? playGuardianEntrance(token) : 0;
 
-    if (planForRun && planForRun.timingType === "pre") {
+    if (planForRun && !planForRun.isGodTen && planForRun.timingType === "pre") {
       planForRun.pathColors.forEach(function (color, i) {
         setTimeout(function () { revealTo(color, token, false); }, baseDelay + (i + 1) * ROTATION_QUARTER_MS);
       });
-    }
-    if (planForRun && planForRun.isGodTen) {
-      playGuardianSequence(token);
     }
     return result;
   };
@@ -133,9 +261,11 @@
     const token = generation;
     let readyAfterShow = 0;
     if (plan && plan.isGodTen) {
-      readyAfterShow += GOD_TOTAL_MS;
-    }
-    if (plan && plan.timingType === "pre" && plan.pathColors.length) {
+      const pathLen = plan.pathColors ? plan.pathColors.length : 0;
+      readyAfterShow = GOD_FREEZE_DELAY_MS + GOD_SHADOW_MS + GOD_WHITE_MS + GOD_REVEAL_MS + GOD_HOLD_MS +
+        (3 * KANJI_SHOW_MS + 2 * KANJI_GAP_MS + KANJI_CLEAR_MS) +
+        (pathLen ? pathLen * UPGRADE_STEP_MS + UPGRADE_HOLD_MS : 0);
+    } else if (plan && plan.timingType === "pre" && plan.pathColors.length) {
       readyAfterShow += plan.pathColors.length * ROTATION_QUARTER_MS + REVEAL_MS;
     }
     const elapsed = Math.max(0, performance.now() - showTime);
@@ -144,7 +274,7 @@
     const startCards = function () {
       if (token !== generation) return Promise.resolve();
       isSummoning = true;
-      if (plan && plan.timingType === "mid") {
+      if (plan && !plan.isGodTen && plan.timingType === "mid") {
         const interval = plan.summonIntervalMs || 650;
         plan.pathColors.forEach(function (color, index) {
           const after = plan.stepCardIndices[index] || (2 + index * 2);
@@ -154,10 +284,16 @@
         });
       }
       return Promise.resolve(nativeSummon.apply(thisArg, originalArgs)).then(function (v) {
-        if (token === generation) isSummoning = false;
+        if (token === generation) {
+          isSummoning = false;
+          exitGuardianAfterSummon(token);
+        }
         return v;
       }, function (e) {
-        if (token === generation) isSummoning = false;
+        if (token === generation) {
+          isSummoning = false;
+          exitGuardianAfterSummon(token);
+        }
         throw e;
       });
     };

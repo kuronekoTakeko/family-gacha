@@ -1,4 +1,4 @@
-/* TEST-29D2: 4枚同心円＋神10連専用「守護神降臨」演出 */
+/* TEST-29D5: 4枚同心円＋神10連専用「守護神降臨」演出 */
 #summon-overlay {
   isolation: isolate;
   overflow: hidden;
@@ -107,16 +107,7 @@
   transform: translate(-50%, -50%) scale(.88);
 }
 #god-ten-guardian .god-ten-guardian__title {
-  top: calc(50% + min(52vw, 260px));
-  padding: .42rem .95rem;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(255,255,255,.85), rgba(255,243,205,.88), rgba(255,255,255,.85));
-  color: #5a3400;
-  font: 900 18px/1.1 system-ui, sans-serif;
-  letter-spacing: .18em;
-  text-shadow: 0 1px 0 rgba(255,255,255,.7);
-  box-shadow: 0 8px 24px rgba(0,0,0,.20);
-  white-space: nowrap;
+  display: none !important;
 }
 #summon-overlay.family-god-shadow #god-ten-guardian .god-ten-guardian__shadow {
   opacity: .42;
@@ -136,9 +127,19 @@
   opacity: .93;
   transform: translate(-50%, -50%) scale(1);
 }
-#summon-overlay.family-god-reveal #god-ten-guardian .god-ten-guardian__title {
-  opacity: .96;
-  transform: translate(-50%, -50%) scale(1);
+#summon-overlay.family-god-summon #god-ten-guardian .god-ten-guardian__bg--white {
+  opacity: .12;
+}
+#summon-overlay.family-god-summon #god-ten-guardian .god-ten-guardian__bg--rainbow {
+  opacity: .18;
+}
+#summon-overlay.family-god-summon #god-ten-guardian .god-ten-guardian__shadow {
+  opacity: 0;
+}
+#summon-overlay.family-god-summon #god-ten-guardian .god-ten-guardian__figure {
+  opacity: .42;
+  transform: translate(-50%, -50%) scale(.99);
+  filter: drop-shadow(0 0 14px rgba(255,255,255,.20)) drop-shadow(0 0 26px rgba(255,224,146,.16));
 }
 #summon-overlay.family-god-exit #god-ten-guardian .god-ten-guardian__bg--white,
 #summon-overlay.family-god-exit #god-ten-guardian .god-ten-guardian__bg--rainbow,
@@ -148,6 +149,52 @@
   opacity: 0;
   transform: translate(-50%, -50%) scale(1.03);
 }
+
+#god-ten-kanji {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(92vw, 860px);
+  height: min(55vw, 440px);
+  transform: translate(-50%, -52%);
+  z-index: 32;
+  pointer-events: none;
+}
+#god-ten-kanji .god-ten-kanji__char {
+  position: absolute;
+  top: 50%;
+  width: clamp(100px, 18vw, 188px);
+  height: auto;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(.68);
+  filter: drop-shadow(0 0 10px rgba(255,236,170,.55)) drop-shadow(0 0 22px rgba(255,185,32,.35));
+  transition: opacity .12s ease, transform .18s ease, filter .18s ease;
+}
+#god-ten-kanji .god-ten-kanji__char--shin { left: 18%; }
+#god-ten-kanji .god-ten-kanji__char--kou  { left: 50%; }
+#god-ten-kanji .god-ten-kanji__char--rin  { left: 82%; }
+#god-ten-kanji .god-ten-kanji__char.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  filter: drop-shadow(0 0 14px rgba(255,246,196,.85)) drop-shadow(0 0 32px rgba(255,190,44,.52));
+}
+
+@media (max-width: 520px) {
+  #god-ten-kanji {
+    width: min(95vw, 680px);
+    height: min(62vw, 340px);
+    transform: translate(-50%, -55%);
+  }
+  #god-ten-kanji .god-ten-kanji__char {
+    width: clamp(82px, 22vw, 150px);
+  }
+  #god-ten-guardian .god-ten-guardian__shadow,
+  #god-ten-guardian .god-ten-guardian__figure {
+    top: 40%;
+    width: min(128vw, 600px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   #magic-circle .magic-circle-rotor,
   #magic-circle.show .magic-circle-rotor { animation: none; will-change: auto; }
@@ -155,7 +202,8 @@
   #god-ten-guardian .god-ten-guardian__bg,
   #god-ten-guardian .god-ten-guardian__shadow,
   #god-ten-guardian .god-ten-guardian__figure,
-  #god-ten-guardian .god-ten-guardian__title {
+  #god-ten-guardian .god-ten-guardian__title,
+  #god-ten-kanji .god-ten-kanji__char {
     transition: none;
     will-change: auto;
   }
