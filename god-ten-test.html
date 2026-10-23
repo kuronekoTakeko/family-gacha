@@ -21,9 +21,9 @@
   </style>
 </head>
 <body>
-  <!-- ゲーム本体は変更せず、同一オリジンの既存ページをそのまま表示します。 -->
-  <iframe id="game-frame" src="./index.html" title="ファミリーガチャ"></iframe>
-  <div id="test-status" role="status" aria-live="polite">神10連テストを準備中…</div>
+  <!-- ゲーム本体は変更せず、同一オリジンの既存ページを29D5Bとして再読み込みします。 -->
+  <iframe id="game-frame" src="./index.html?god-test-build=29D5B" title="ファミリーガチャ"></iframe>
+  <div id="test-status" role="status" aria-live="polite">神10連テストを準備中（29D5B）…</div>
   <script>
   (function () {
     'use strict';
@@ -38,7 +38,7 @@
     frame.addEventListener('load', function () {
       try {
         const game = frame.contentWindow;
-        // 実際のSTEP 29D3の抽選関数・守護神演出を使用する。
+        // 実際の最新版の抽選関数・守護神演出を使用する。
         if (!game || typeof game.drawTenCards !== 'function' ||
             typeof game.saveCurrentResultsToAlbum !== 'function') {
           throw new Error('ゲームの準備が確認できません');
@@ -49,6 +49,11 @@
         game.saveCurrentResultsToAlbum = function () {
           return new game.Set();
         };
+
+        const badge = game.document.getElementById('version-check-badge');
+        if (!badge || !badge.textContent.includes('29D5B')) {
+          throw new Error('内部ゲームが最新版ではありません: ' + (badge ? badge.textContent : 'badge missing'));
+        }
 
         const normalDraw = game.drawTenCards;
         let testPending = true;
@@ -83,9 +88,9 @@
           }
         };
 
-        report('神10連テスト準備OK｜最初の10連だけ確定・保存なし');
+        report('神10連テスト29D5B準備OK｜最初の10連だけ確定・保存なし');
       } catch (error) {
-        report('テストの準備に失敗しました。通常ページで遊んでください。', true);
+        report('テスト準備失敗：最新版を読み込めていません。再読み込みしてください。', true);
         console.error('[Family Gacha God Ten Test]', error);
       }
     });
