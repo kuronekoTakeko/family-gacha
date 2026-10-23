@@ -154,21 +154,21 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(92vw, 860px);
-  height: min(55vw, 440px);
+  width: min(96vw, 980px);
+  height: min(58vw, 500px);
   transform: translate(-50%, -52%);
   z-index: 32;
   pointer-events: none;
 }
 #god-ten-kanji .god-ten-kanji__char {
   position: absolute;
-  top: 50%;
-  width: clamp(100px, 18vw, 188px);
+  top: 56%;
+  width: clamp(150px, 26vw, 290px);
   height: auto;
   opacity: 0;
-  transform: translate(-50%, -50%) scale(.68);
-  filter: drop-shadow(0 0 10px rgba(255,236,170,.55)) drop-shadow(0 0 22px rgba(255,185,32,.35));
-  transition: opacity .12s ease, transform .18s ease, filter .18s ease;
+  transform: translate(-50%, -50%) scale(.62);
+  filter: drop-shadow(0 0 12px rgba(255,236,170,.60)) drop-shadow(0 0 28px rgba(255,185,32,.42));
+  transition: opacity .10s ease, transform .18s ease, filter .18s ease;
 }
 #god-ten-kanji .god-ten-kanji__char--shin { left: 18%; }
 #god-ten-kanji .god-ten-kanji__char--kou  { left: 50%; }
@@ -176,17 +176,26 @@
 #god-ten-kanji .god-ten-kanji__char.show {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
-  filter: drop-shadow(0 0 14px rgba(255,246,196,.85)) drop-shadow(0 0 32px rgba(255,190,44,.52));
+  filter: drop-shadow(0 0 16px rgba(255,246,196,.95)) drop-shadow(0 0 40px rgba(255,190,44,.60));
+}
+#summon-overlay.family-god-kanji-active #god-ten-kanji .god-ten-kanji__char.show {
+  animation: familyKanjiImpact .36s ease-out both;
+}
+@keyframes familyKanjiImpact {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.48); }
+  58% { opacity: 1; transform: translate(-50%, -50%) scale(1.13); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
 @media (max-width: 520px) {
   #god-ten-kanji {
-    width: min(95vw, 680px);
-    height: min(62vw, 340px);
-    transform: translate(-50%, -55%);
+    width: min(98vw, 760px);
+    height: min(70vw, 380px);
+    transform: translate(-50%, -54%);
   }
   #god-ten-kanji .god-ten-kanji__char {
-    width: clamp(82px, 22vw, 150px);
+    top: 58%;
+    width: clamp(118px, 28vw, 210px);
   }
   #god-ten-guardian .god-ten-guardian__shadow,
   #god-ten-guardian .god-ten-guardian__figure {

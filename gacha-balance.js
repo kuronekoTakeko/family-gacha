@@ -195,7 +195,7 @@
     })();
 
     const meta = {
-      version: "29D5",
+      version: "29D5B",
       isGodTen: isGodTen,
       godTenChance: GOD_TEN_CHANCE,
       circlePlan: buildCirclePlan(results, isGodTen)
@@ -207,5 +207,5 @@
   };
 
   const badge = document.getElementById("version-check-badge");
-  if (badge) badge.textContent = "TEST -29D5 / JS OK";
+  if (badge) badge.textContent = "TEST -29D5B / JS OK";
 })();

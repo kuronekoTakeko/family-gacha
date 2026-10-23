@@ -31,8 +31,9 @@
   const GOD_WHITE_MS = 620;
   const GOD_REVEAL_MS = 1100;
   const GOD_HOLD_MS = 180;
-  const KANJI_SHOW_MS = 260;
-  const KANJI_GAP_MS = 160;
+  const KANJI_SHOW_MS = 240;
+  const KANJI_GAP_MS = 110;
+  const KANJI_FULL_HOLD_MS = 540;
   const KANJI_CLEAR_MS = 160;
   const UPGRADE_STEP_MS = 620;
   const UPGRADE_HOLD_MS = 260;
@@ -163,24 +164,20 @@
     sequence.forEach(function (key, index) {
       const node = kanjiContainer.querySelector('[data-kanji="' + key + '"]');
       const onAt = startAt + index * (KANJI_SHOW_MS + KANJI_GAP_MS);
-      const offAt = onAt + KANJI_SHOW_MS;
       setTimeout(function () {
         if (token !== generation || !circle.classList.contains("show")) return;
         overlay.classList.add("family-god-kanji-active");
         if (node) node.classList.add("show");
       }, onAt);
-      setTimeout(function () {
-        if (token !== generation) return;
-        if (node) node.classList.remove("show");
-      }, offAt);
     });
-    const total = sequence.length * KANJI_SHOW_MS + (sequence.length - 1) * KANJI_GAP_MS;
+    const totalReveal = sequence.length * KANJI_SHOW_MS + (sequence.length - 1) * KANJI_GAP_MS;
+    const clearAt = startAt + totalReveal + KANJI_FULL_HOLD_MS;
     setTimeout(function () {
       if (token !== generation) return;
       overlay.classList.remove("family-god-kanji-active");
       clearKanjiClasses();
-    }, startAt + total + KANJI_CLEAR_MS);
-    return total + KANJI_CLEAR_MS;
+    }, clearAt + KANJI_CLEAR_MS);
+    return totalReveal + KANJI_FULL_HOLD_MS + KANJI_CLEAR_MS;
   }
 
   function scheduleGodUpgrades(token, startAt) {
