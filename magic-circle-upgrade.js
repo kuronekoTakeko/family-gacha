@@ -260,13 +260,13 @@
     if (plan && plan.isGodTen) {
       const pathLen = plan.pathColors ? plan.pathColors.length : 0;
       readyAfterShow = GOD_FREEZE_DELAY_MS + GOD_SHADOW_MS + GOD_WHITE_MS + GOD_REVEAL_MS + GOD_HOLD_MS +
-        (3 * KANJI_SHOW_MS + 2 * KANJI_GAP_MS + KANJI_CLEAR_MS) +
+        (3 * KANJI_SHOW_MS + 2 * KANJI_GAP_MS + KANJI_FULL_HOLD_MS + KANJI_CLEAR_MS) +
         (pathLen ? pathLen * UPGRADE_STEP_MS + UPGRADE_HOLD_MS : 0);
     } else if (plan && plan.timingType === "pre" && plan.pathColors.length) {
       readyAfterShow += plan.pathColors.length * ROTATION_QUARTER_MS + REVEAL_MS;
     }
     const elapsed = Math.max(0, performance.now() - showTime);
-    const wait = Math.max(0, Math.ceil(readyAfterShow - elapsed));
+    const wait = Math.max(0, Math.ceil(readyAfterShow - elapsed + (plan && plan.isGodTen ? 50 : 0)));
 
     const startCards = function () {
       if (token !== generation) return Promise.resolve();
