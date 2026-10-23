@@ -1,0 +1,26 @@
+{
+  "id": "./",
+  "name": "ファミリーガチャ",
+  "short_name": "ファミガチャ",
+  "description": "家族カードを集めるファンタジーガチャゲーム",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#10243a",
+  "theme_color": "#10243a",
+  "icons": [
+    {
+      "src": "icons/family-gacha-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/family-gacha-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
