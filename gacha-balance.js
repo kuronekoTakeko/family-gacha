@@ -115,9 +115,9 @@
       const finalColor = highestRarity === "UR" ? "rainbow"
         : highestRarity === "SSR" ? "gold"
         : "purple";
+      // 神10連のURは二神確定。SR/SSRは男神・女神を独立に50%ずつ選択。
       const guardianVariant = highestRarity === "UR" ? "duo"
-        : highestRarity === "SSR" ? "male"
-        : "female";
+        : (Math.random() < 0.5 ? "male" : "female");
       const pathColors = colorOrder.filter(function (color) {
         return colorLevel(color) > colorLevel("blue") &&
                colorLevel(color) <= colorLevel(finalColor);
@@ -195,7 +195,7 @@
     })();
 
     const meta = {
-      version: "29D5B",
+      version: "29D5C",
       isGodTen: isGodTen,
       godTenChance: GOD_TEN_CHANCE,
       circlePlan: buildCirclePlan(results, isGodTen)
@@ -207,5 +207,5 @@
   };
 
   const badge = document.getElementById("version-check-badge");
-  if (badge) badge.textContent = "TEST -29D5B / JS OK";
+  if (badge) badge.textContent = "TEST -29D5C / JS OK";
 })();
