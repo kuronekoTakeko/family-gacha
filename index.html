@@ -226,6 +226,12 @@
 
 </div>
 
+<!-- STEP 30C: 所持データを読み取り専用で書き出す。復元・削除はしない。 -->
+<div class="album-backup-tools" style="text-align:center;margin:12px auto 16px;padding:0 12px;max-width:400px;">
+  <button type="button" id="album-backup-download" class="button secondary" style="width:100%;min-height:44px;">所持カードをバックアップ</button>
+  <p id="album-backup-message" role="status" aria-live="polite" style="font-size:12px;line-height:1.5;margin:8px 0 0;color:inherit;">JSONファイルに保存します。アルバムは変更されません。</p>
+</div>
+
 <div id="album-grid" class="album-grid"></div>
 
     </div>
@@ -339,6 +345,8 @@
     <script src="summon-center-size.js?v=29D3"></script>
     <!-- STEP 29F: 引用符入りカード名の画像altを安全に補正（開封処理・演出は変更しない） -->
     <script src="card-name-alt-fix.js?v=29F"></script>
+    <!-- STEP 30C: アルバムバックアップ（書き出し専用） -->
+    <script src="album-backup-export.js?v=30C"></script>
     <script>
       (function () {
         const badge = document.getElementById("version-check-badge");
