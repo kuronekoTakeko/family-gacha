@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>STEP 31A ガチャバランステスト｜ファミリーガチャ</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b0b0b}
+#game-frame{position:fixed;inset:0;width:100%;height:100vh;height:100dvh;border:0}
+#status{position:fixed;bottom:max(10px,env(safe-area-inset-bottom));left:10px;z-index:2147483647;pointer-events:none;max-width:min(90vw,360px);padding:7px 10px;background:rgba(13,40,64,.95);color:#fff;border:1px solid #71cdfb;border-radius:8px;font:600 12px/1.4 system-ui}
+#status.error{background:#6d2525}
+</style>
+</head>
+<body>
+<iframe id="game-frame" src="./index.html?balance-test=31A" title="ファミリーガチャ STEP31A"></iframe>
+<div id="status" role="status" aria-live="polite">STEP 31A 読み込み中…</div>
+<script>
+(function(){
+  "use strict";
+  const frame=document.getElementById("game-frame");
+  const status=document.getElementById("status");
+  function report(text,error){status.textContent=text;status.classList.toggle("error",!!error);}
+  frame.addEventListener("load",function(){
+    try{
+      const game=frame.contentWindow;
+      if(!game || typeof game.drawTenCards!=="function" ||
+         typeof game.saveCurrentResultsToAlbum!=="function") throw new Error("ゲームが読み込めません");
+      const badge=game.document.getElementById("version-check-badge");
+      if(!badge || !badge.textContent.includes("29D5D")) throw new Error("ゲーム本体が最新版ではありません");
+      // Only the iframe is patched. The existing game URL is untouched.
+      game.saveCurrentResultsToAlbum=function(){return new game.Set();};
+      const js=game.document.createElement("script");
+      js.src="./gacha-balance-step31a.js?v=31A";
+      js.onload=function(){
+        if(!badge.textContent.includes("31A")){report("調整版の適用に失敗しました",true);return;}
+        report("STEP 31A 準備OK｜通常10連の確率を試せます／アルバム保存なし");
+      };
+      js.onerror=function(){report("調整版スクリプトの読み込みに失敗しました",true);};
+      game.document.body.appendChild(js);
+    }catch(error){report("STEP 31A 準備失敗："+error.message,true);console.error(error);}
+  });
+})();
+</script>
+</body>
+</html>
