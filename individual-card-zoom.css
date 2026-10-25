@@ -1,0 +1,30 @@
+/* STEP 33B: Gestures affect the revealed card only; never the backdrop or aura. */
+#individual-reveal.active #individual-reveal-card.revealed {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#individual-reveal.active #individual-reveal-card.revealed img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#individual-reveal #individual-card-zoom-reset {
+  display: none;
+  position: absolute;
+  z-index: 40;
+  bottom: max(58px, calc(18px + env(safe-area-inset-bottom)));
+  left: 50%;
+  transform: translateX(-50%);
+  min-height: 42px;
+  padding: 9px 17px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.75);
+  background: rgba(28,42,71,.95);
+  color: #fff;
+  font: 700 14px/1.3 system-ui, sans-serif;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+#individual-reveal.active.is-card-zoomed #individual-card-zoom-reset { display: block; }
+#individual-reveal.active.is-card-zoomed #individual-reveal-card.revealed { z-index: 10; }

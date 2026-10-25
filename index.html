@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="summon-waiting-guard.css?v=31B" />
   <link rel="stylesheet" href="summon-skip.css?v=32A" />
   <link rel="stylesheet" href="album-card-zoom.css?v=33A" />
+  <link rel="stylesheet" href="individual-card-zoom.css?v=33B" />
 </head>
 
 <body class="home-viewport screen-scroll-locked">
@@ -372,6 +373,8 @@
     <script src="summon-skip.js?v=32A2"></script>
     <!-- STEP 33A: album-only fullscreen card inspection, no storage mutations -->
     <script src="album-card-zoom.js?v=33A"></script>
+    <!-- STEP 33B: pinch only the individual revealed card; leave effects and draw unchanged. -->
+    <script src="individual-card-zoom.js?v=33B"></script>
     <script>
       (function () {
         const badge = document.getElementById("version-check-badge");
