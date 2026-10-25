@@ -22,7 +22,7 @@
 
 <body class="home-viewport screen-scroll-locked">
   <!-- 更新確認用: STEP 7。表示位置には影響しません。 -->
-  <div id="version-check-badge" aria-label="テストバージョン" style="position:fixed;top:8px;right:8px;z-index:2147483647;padding:5px 8px;border-radius:6px;background:#172b42;color:#ffffff;border:1px solid #75cfff;font:700 11px/1.4 system-ui,sans-serif;pointer-events:none;box-shadow:0 2px 8px #0008;">TEST -29D5D / HTML</div>
+  <div id="version-check-badge" aria-label="テストバージョン" style="position:fixed;top:8px;right:8px;z-index:2147483647;padding:5px 8px;border-radius:6px;background:#172b42;color:#ffffff;border:1px solid #75cfff;font:700 11px/1.4 system-ui,sans-serif;pointer-events:none;box-shadow:0 2px 8px #0008;">TEST -31C / HTML</div>
 
   <main class="app">
 
@@ -349,7 +349,7 @@
       })();
     </script>
     <!-- TEST-28F: 排出確率を調整／10連SR以上保証を撤廃 -->
-    <script src="gacha-balance.js?v=29D5C"></script>
+    <script src="gacha-balance.js?v=31C"></script>
     <script src="magic-circle-upgrade.js?v=29D5D"></script>
     <script src="summon-center-size.js?v=29D3"></script>
     <!-- STEP 31B: hide cards until their individual summon begins. -->
@@ -362,7 +362,7 @@
       (function () {
         const badge = document.getElementById("version-check-badge");
         if (badge && Element.prototype.__family29BSizePatch) {
-          badge.textContent = "TEST -29D5D / JS OK";
+          badge.textContent = "TEST -31C / JS OK";
         }
       })();
     </script>

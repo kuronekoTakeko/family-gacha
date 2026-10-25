@@ -1,8 +1,8 @@
-/* TEST-29D5: 神10連1%＋守護神降臨＋特殊スタート確率調整 */
+/* STEP 31C: balanced rarity rates & meaningful upgrades; God Ten preserved. */
 (function () {
   "use strict";
 
-  const newRates = { N: 65, R: 25, SR: 8, SSR: 1.5, UR: 0.5 };
+  const newRates = { N: 62, R: 25, SR: 10, SSR: 2.4, UR: 0.6 };
   const GOD_TEN_CHANCE = 0.01; // 1%
   const SUMMON_INTERVAL_MS = 650;
   const rarityOrder = { N: 0, R: 1, SR: 2, SSR: 3, UR: 4 };
@@ -34,79 +34,73 @@
     }, "N");
   }
 
-  function chooseFinalCircle(highestRarity) {
-    if (highestRarity === "N" || highestRarity === "R") return "blue";
-    if (highestRarity === "SR") {
-      return rollPercentTable([
-        { value: "blue", rate: 80 },
-        { value: "purple", rate: 20 }
-      ]);
-    }
-    if (highestRarity === "SSR") {
-      return rollPercentTable([
-        { value: "blue", rate: 65 },
-        { value: "purple", rate: 25 },
-        { value: "gold", rate: 10 }
-      ]);
-    }
-    if (highestRarity === "UR") {
-      return rollPercentTable([
-        { value: "blue", rate: 50 },
-        { value: "purple", rate: 25 },
-        { value: "gold", rate: 20 },
-        { value: "rainbow", rate: 5 }
-      ]);
-    }
-    return "blue";
-  }
+  const level = { blue: 0, purple: 1, gold: 2, rainbow: 3 };
 
-  // 10連全体で紫約5% / 金約1% / 虹約0.1%。
-  // まず元の最終色を決め、その範囲内で開始色を抽選する。
-  // 神10連1%を含む理論上の最終色分布から条件付き確率を計算。
-  // 最終色（および元の昇格抽選確率）には手を加えない。
-  const START_CHANCE = {
-    purple: 0.319841694265,
-    gold: 0.386630948963,
-    rainbow: 0.381580342660
-  };
-
-  function chooseSpecialStart(finalColor) {
-    const maxLevel = colorLevel(finalColor);
-    if (maxLevel >= 3 && Math.random() < START_CHANCE.rainbow) return "rainbow";
-    if (maxLevel >= 2 && Math.random() < START_CHANCE.gold) return "gold";
-    if (maxLevel >= 1 && Math.random() < START_CHANCE.purple) return "purple";
-    return "blue";
-  }
-
-  function chooseUpgradePath(finalColor) {
-    if (finalColor === "blue") return [];
-    if (finalColor === "purple") return ["purple"];
-    if (finalColor === "gold") {
-      return Math.random() < 0.70 ? ["purple", "gold"] : ["gold"];
-    }
-    if (finalColor === "rainbow") {
+  function choosePath(color) {
+    if (color === "purple") return ["purple"];
+    if (color === "gold") return Math.random() < .65 ? ["purple", "gold"] : ["gold"];
+    if (color === "rainbow") {
       const roll = Math.random();
-      if (roll < 0.60) return ["purple", "gold", "rainbow"];
-      if (roll < 0.85) return ["gold", "rainbow"];
-      return ["rainbow"];
+      return roll < .55 ? ["purple", "gold", "rainbow"]
+        : roll < .80 ? ["gold", "rainbow"] : ["rainbow"];
     }
     return [];
   }
 
   function chooseTiming(pathLength) {
-    if (pathLength <= 0) return { type: "none", cardIndices: [] };
-    if (Math.random() < 0.30) return { type: "pre", cardIndices: [] };
-    if (pathLength === 1) {
-      const patterns = [[2], [3], [5], [7]];
-      return { type: "mid", cardIndices: patterns[Math.floor(Math.random() * patterns.length)] };
-    }
-    if (pathLength === 2) {
-      const patterns = [[2, 5], [3, 6], [2, 7]];
-      return { type: "mid", cardIndices: patterns[Math.floor(Math.random() * patterns.length)] };
-    }
-    const patterns = [[2, 4, 6], [3, 5, 7]];
-    return { type: "mid", cardIndices: patterns[Math.floor(Math.random() * patterns.length)] };
+    if (!pathLength) return { type: "none", indices: [] };
+    if (Math.random() < .35) return { type: "pre", indices: [] };
+    const patterns = pathLength === 1 ? [[2], [3], [5], [7]]
+      : pathLength === 2 ? [[2, 5], [3, 6], [2, 7]]
+      : [[2, 4, 6], [3, 5, 7]];
+    return { type: "mid", indices: patterns[Math.floor(Math.random() * patterns.length)] };
   }
+
+  function chooseSpecialStart(hasUR, hasSSR, rareCount) {
+    // Occasional rare-color opening, rather than a mid-summon upgrade.
+    // Only good result groups qualify; a single SR remains blue.
+    const roll = Math.random();
+    if (hasUR) return roll < .01 ? "rainbow" : roll < .05 ? "gold" : roll < .10 ? "purple" : "blue";
+    if (hasSSR) return roll < .02 ? "gold" : roll < .09 ? "purple" : "blue";
+    if (rareCount >= 2) return roll < .05 ? "purple" : "blue";
+    return "blue";
+  }
+
+  function makePlan(cards) {
+    const rareCount = cards.filter(function (c) { return ["SR", "SSR", "UR"].includes(c.rarity); }).length;
+    const hasUR = cards.some(function (c) { return c.rarity === "UR"; });
+    const hasSSR = cards.some(function (c) { return c.rarity === "SSR"; });
+    const highestRarity = hasUR ? "UR" : hasSSR ? "SSR" : rareCount ? "SR"
+      : cards.some(function (c) { return c.rarity === "R"; }) ? "R" : "N";
+    // Independent roll for every ten-pull, conditional on the ACTUAL result.
+    const upgradeChance = hasUR ? .80 : hasSSR ? .50 : rareCount >= 2 ? .30 : 0;
+    const doUpgrade = Math.random() < upgradeChance;
+    let startColor = "blue";
+    let finalColor = "blue";
+    let pathColors = [];
+    let timing = { type: "none", indices: [] };
+    if (doUpgrade) {
+      if (hasUR) finalColor = Math.random() < .70 ? "rainbow" : "gold";
+      else if (hasSSR) finalColor = Math.random() < .40 ? "gold" : "purple";
+      else finalColor = "purple";
+      const chosenPath = choosePath(finalColor);
+      timing = chooseTiming(chosenPath.length);
+      // Pre-appearance color upgrades keep the current step-by-step display.
+      pathColors = timing.type === "pre"
+        ? ["purple", "gold", "rainbow"].filter(function (c) { return level[c] <= level[finalColor]; })
+        : chosenPath;
+    } else {
+      startColor = chooseSpecialStart(hasUR, hasSSR, rareCount);
+      finalColor = startColor;
+    }
+    return {
+      isGodTen: false, guardianVariant: null, highestRarity: highestRarity,
+      startColor: startColor, finalColor: finalColor, pathColors: pathColors,
+      timingType: timing.type, stepCardIndices: timing.indices,
+      summonIntervalMs: 650, plannedAt: Date.now()
+    };
+  }
+
 
   function buildCirclePlan(results, isGodTen) {
     const highestRarity = getHighestRarity(results);
@@ -136,32 +130,7 @@
       };
     }
 
-    const finalColor = chooseFinalCircle(highestRarity);
-    const startColor = chooseSpecialStart(finalColor);
-
-    const roughPath = chooseUpgradePath(finalColor).filter(function (color) {
-      return colorLevel(color) > colorLevel(startColor);
-    });
-    const pathColors = roughPath.length || startColor === finalColor ? roughPath : [finalColor];
-    const timing = chooseTiming(pathColors.length);
-    const sequentialColors = ["purple", "gold", "rainbow"].filter(function (color) {
-      return colorLevel(color) > colorLevel(startColor) &&
-             colorLevel(color) <= colorLevel(finalColor);
-    });
-    const actualPath = timing.type === "pre" ? sequentialColors : pathColors;
-
-    return {
-      isGodTen: false,
-      guardianVariant: null,
-      highestRarity: highestRarity,
-      startColor: startColor,
-      finalColor: finalColor,
-      pathColors: actualPath,
-      timingType: timing.type,
-      stepCardIndices: timing.cardIndices,
-      summonIntervalMs: SUMMON_INTERVAL_MS,
-      plannedAt: Date.now()
-    };
+    return makePlan(results);
   }
 
   function drawGodTenCards() {
@@ -195,7 +164,7 @@
     })();
 
     const meta = {
-      version: "29D5C",
+      version: "31C",
       isGodTen: isGodTen,
       godTenChance: GOD_TEN_CHANCE,
       circlePlan: buildCirclePlan(results, isGodTen)
@@ -207,5 +176,5 @@
   };
 
   const badge = document.getElementById("version-check-badge");
-  if (badge) badge.textContent = "TEST -29D5C / JS OK";
+  if (badge) badge.textContent = "TEST -31C / JS OK";
 })();

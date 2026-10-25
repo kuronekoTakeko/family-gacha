@@ -16,7 +16,7 @@ html,body { margin:0; width:100%; height:100%; overflow:hidden; background:#0b0b
 </style>
 </head>
 <body>
-<iframe id="game-frame" src="./index.html?rare-reveal-test=29E" title="ファミリーガチャ"></iframe>
+<iframe id="game-frame" src="./index.html?rare-reveal-test=31C" title="ファミリーガチャ"></iframe>
 <div id="test-status" role="status" aria-live="polite">STEP 29E テスト準備中…</div>
 <script>
 (function(){
@@ -38,8 +38,8 @@ html,body { margin:0; width:100%; height:100%; overflow:hidden; background:#0b0b
       const pool = game.eval("cardPool");
       if (!Array.isArray(pool)) throw new Error("カード一覧を取得できません");
       const badge = game.document.getElementById("version-check-badge");
-      if (!badge || !badge.textContent.includes("29D5D")) {
-        throw new Error("ゲーム本体のバージョンが29D5Dではありません");
+      if (!badge || !badge.textContent.includes("31C")) {
+        throw new Error("ゲーム本体のバージョンが31Cではありません");
       }
       const cardByNumber = new Map(pool.map(function(card){return [card.number, card];}));
       const numbers = [9,13,17,10,14,11,15,12,16,5];
