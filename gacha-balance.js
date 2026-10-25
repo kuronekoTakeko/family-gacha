@@ -49,7 +49,7 @@
 
   function chooseTiming(pathLength) {
     if (!pathLength) return { type: "none", indices: [] };
-    if (Math.random() < .35) return { type: "pre", indices: [] };
+    if (Math.random() < .50) return { type: "pre", indices: [] };
     const patterns = pathLength === 1 ? [[2], [3], [5], [7]]
       : pathLength === 2 ? [[2, 5], [3, 6], [2, 7]]
       : [[2, 4, 6], [3, 5, 7]];
