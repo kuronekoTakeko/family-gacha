@@ -51,8 +51,22 @@
     card.style.removeProperty('animation');
   }
   function resetForNewCard() { reset(); gestureWasPinch = false; suppressNextClick = false; }
-  const observer = new MutationObserver(function () {
-    if (!overlay.classList.contains('active') || !card.classList.contains('revealed')) resetForNewCard();
+  // STEP 33B1: reset only when the reveal changes, never in response to our own
+  // is-card-zoomed class toggle. Otherwise the observer can schedule itself
+  // indefinitely while the reveal is hidden / the new card is preparing.
+  let wasActive = overlay.classList.contains('active');
+  let wasRevealed = card.classList.contains('revealed');
+  const observer = new MutationObserver(function (records) {
+    const activeNow = overlay.classList.contains('active');
+    const revealedNow = card.classList.contains('revealed');
+    const cardReplaced = records.some(function (record) {
+      return record.type === 'childList' && record.target === card;
+    });
+    if (activeNow !== wasActive || (wasRevealed && !revealedNow) || cardReplaced) {
+      resetForNewCard();
+    }
+    wasActive = activeNow;
+    wasRevealed = revealedNow;
   });
   observer.observe(overlay, { attributes:true, attributeFilter:['class'] });
   observer.observe(card, { attributes:true, attributeFilter:['class'] });
