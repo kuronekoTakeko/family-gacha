@@ -1,0 +1,5 @@
+/* STEP 31B: visibility is not overridden by old opacity/transform Web Animations.
+   A card stays hidden until its own 760ms summon arc begins. */
+#card-grid.summon-active .closed-card.summon-waiting {
+  visibility: hidden !important;
+}
