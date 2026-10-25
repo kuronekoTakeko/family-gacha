@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="magic-circle-upgrade.css?v=29D5B" />
   <link rel="stylesheet" href="summon-waiting-guard.css?v=31B" />
   <link rel="stylesheet" href="summon-skip.css?v=32A" />
+  <link rel="stylesheet" href="album-card-zoom.css?v=33A" />
 </head>
 
 <body class="home-viewport screen-scroll-locked">
@@ -369,6 +370,8 @@
     <script src="album-backup-export.js?v=30C"></script>
     <!-- STEP 32A: 召喚のみスキップ。抽選・開封・アルバムの処理は維持。 -->
     <script src="summon-skip.js?v=32A2"></script>
+    <!-- STEP 33A: album-only fullscreen card inspection, no storage mutations -->
+    <script src="album-card-zoom.js?v=33A"></script>
     <script>
       (function () {
         const badge = document.getElementById("version-check-badge");
