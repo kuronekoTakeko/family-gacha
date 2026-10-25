@@ -72,6 +72,11 @@
   }
 
   window.startSummonBlackout = function () {
+    // STEP 32A2: restore only temporary visibility from an earlier skip.
+    const guardian = document.getElementById('god-ten-guardian');
+    const kanji = document.getElementById('god-ten-kanji');
+    if (guardian) guardian.style.removeProperty('visibility');
+    if (kanji) kanji.style.removeProperty('visibility');
     // The original start function remains responsible for sound and overlay.
     beginTracking();
     return nativeStart.apply(this, arguments);
@@ -89,9 +94,16 @@
       overlay.classList.remove('active','family-god-kanji-active', 'family-god-shadow',
         'family-god-white', 'family-god-rainbow', 'family-god-reveal',
         'family-god-summon', 'family-god-exit');
-      overlay.querySelectorAll('.family-god-kanji .show, .family-god-kanji-show').forEach(function (e) {
-        e.classList.remove('show', 'family-god-kanji-show');
+      // Actual 29D5D markup uses #god-ten-kanji .god-ten-kanji__char.show.
+      // Clear all three characters, including the first "神" at skip time.
+      overlay.querySelectorAll('#god-ten-kanji .god-ten-kanji__char').forEach(function (e) {
+        e.classList.remove('show');
       });
+      // Prevent lingering CSS transition frames after the skip.
+      const kanji = document.getElementById('god-ten-kanji');
+      if (kanji) kanji.style.visibility = 'hidden';
+      const guardian = document.getElementById('god-ten-guardian');
+      if (guardian) guardian.style.visibility = 'hidden';
     }
     if (circle) {
       circle.classList.remove('show','hiding','family-paused');
