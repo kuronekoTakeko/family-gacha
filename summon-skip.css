@@ -1,0 +1,18 @@
+/* STEP 32A: summon-only skip (draw results are never changed). */
+#summon-skip-button {
+  position: fixed;
+  top: max(52px, calc(env(safe-area-inset-top) + 52px));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 2147483646;
+  padding: 10px 16px;
+  border: 1px solid rgba(180,218,255,.8);
+  border-radius: 24px;
+  color: white;
+  background: rgba(20,40,65,.96);
+  box-shadow: 0 3px 15px rgba(0,0,0,.5);
+  font: 700 14px/1.2 system-ui, sans-serif;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+#summon-skip-button[hidden] { display: none !important; }
+#summon-skip-button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
