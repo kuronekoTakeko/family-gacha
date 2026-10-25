@@ -218,12 +218,38 @@
 
       <p id="album-count" class="gacha-message"></p>
 
-<div class="album-controls">
-
-  <label for="album-sort">
-    並び替え
-  </label>
-
+<!-- STEP 34B: 並び替え（左）とデータ管理（右）を1行に整理。保存処理には触れない。 -->
+<style>
+  #album-screen .album-controls.album-toolbar-34b {
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: -6px 0 12px;
+  }
+  #album-screen .album-sort-group-34b {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  #album-screen .album-data-management {
+    margin: 0 0 0 auto;
+    min-width: 0;
+    max-width: 100%;
+  }
+  #album-screen .album-data-management[open] {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+  #album-screen .album-data-management .album-backup-tools {
+    margin-left: auto;
+    margin-right: 0;
+  }
+</style>
+<div class="album-controls album-toolbar-34b">
+  <div class="album-sort-group-34b">
+    <label for="album-sort">並び替え</label>
   <select id="album-sort">
 
     <option value="rarity">
@@ -243,20 +269,17 @@
     </option>
 
   </select>
-
-</div>
-
-<!-- STEP 34A: バックアップを折りたたみ表示。保存・書き出し処理自体は変更しない。 -->
-<details class="album-data-management" style="width:min(100%,400px);margin:4px 0 12px auto;">
-  <summary style="display:list-item;cursor:pointer;list-style-position:inside;text-align:right;width:fit-content;margin-left:auto;padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.82);color:#332c25;font-size:14px;font-weight:700;min-height:40px;box-sizing:border-box;">
-    データ管理
-  </summary>
-  <!-- STEP 30C: 所持データを読み取り専用で書き出す。復元・削除はしない。 -->
-  <div class="album-backup-tools" style="text-align:center;margin:12px auto 8px;padding:0 6px;max-width:400px;">
-    <button type="button" id="album-backup-download" class="button secondary" style="width:100%;min-height:44px;">所持カードをバックアップ</button>
-    <p id="album-backup-message" role="status" aria-live="polite" style="font-size:12px;line-height:1.5;margin:8px 0 0;color:inherit;">JSONファイルに保存します。アルバムは変更されません。</p>
   </div>
-</details>
+  <!-- STEP 34A: バックアップは折りたたんでおく。 -->
+  <details class="album-data-management">
+    <summary style="display:list-item;cursor:pointer;list-style-position:inside;text-align:right;width:fit-content;margin-left:auto;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.82);color:#332c25;font-size:14px;font-weight:700;min-height:40px;box-sizing:border-box;">データ管理</summary>
+    <!-- STEP 30C: 所持データを読み取り専用で書き出す。復元・削除はしない。 -->
+    <div class="album-backup-tools" style="text-align:center;margin:12px auto 8px;padding:0 6px;max-width:400px;">
+      <button type="button" id="album-backup-download" class="button secondary" style="width:100%;min-height:44px;">所持カードをバックアップ</button>
+      <p id="album-backup-message" role="status" aria-live="polite" style="font-size:12px;line-height:1.5;margin:8px 0 0;color:inherit;">JSONファイルに保存します。アルバムは変更されません。</p>
+    </div>
+  </details>
+</div>
 
 <div id="album-grid" class="album-grid"></div>
 
